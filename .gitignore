@@ -1,0 +1,18 @@
+# RAD Phase 6: MCP config contains credentials — never commit
+.cursor/mcp.json
+
+# Environment and secrets
+.env
+.env.local
+.env.*.local
+
+# Dependencies and build
+node_modules
+.next
+out
+dist
+build
+
+# IDE and OS
+.DS_Store
+*.log

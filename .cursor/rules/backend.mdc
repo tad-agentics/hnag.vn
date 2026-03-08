@@ -1,0 +1,13 @@
+---
+description: Backend, database, and API rules
+globs:
+  - src/api/**/*
+  - src/lib/**/*
+alwaysApply: false
+---
+
+- RLS required on every Supabase table — never skip or bypass
+- Always use Supabase Auth — no custom JWT implementation
+- Default to SQL for deterministic queries — no LLM for structured data
+- LLM calls only for approved features listed in project.mdc
+- All API responses must match contracts in tech-spec.md

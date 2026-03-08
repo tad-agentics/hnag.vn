@@ -1,0 +1,12 @@
+---
+description: Brand voice and copy standards from emotional design system
+globs: src/**/*.tsx
+alwaysApply: false
+---
+
+- All dynamic text must use real data variables — never lorem ipsum or placeholder strings
+- Copy formula: [paste formula structure from emotional design system — Section 5]
+- [Paste project-specific forbidden opening words from emotional design system — Section 5]
+- All copy slots defined in the screen spec must be populated before committing
+- [Paste forbidden words list from emotional design system — Section 7]
+- [Paste screen-context copy rules from emotional design system — Section 6]

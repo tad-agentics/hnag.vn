@@ -1,0 +1,29 @@
+---
+description: Project context, stack, and build constraints
+alwaysApply: true
+---
+
+## Project
+Hôm Nay Ăn Gì? (HNAG) — Vietnamese AI-powered family meal planning PWA. Target: families who cook at home; core value = swipe-to-decide món Việt in under 60 seconds, with health rules (bệnh lý), Tủ Lạnh mode, and behavioral memory. Domain: hnag.vn.
+
+## Tech Stack
+- Frontend (current): Vite 6 + React 18 + React Router 7 + Tailwind 4. Design system: `guidelines/Guidelines.md` + `src/styles/theme.css` (CSS custom properties).
+- Target (tech-spec): Astro 4 + React Islands for SSG landing/blog; React SPA for `/app` and onboarding. API: Astro API Endpoints (`src/pages/api/*.ts`).
+- Backend: Supabase (PostgreSQL + Auth + RLS), Upstash Redis, Cloudflare R2. Hosting: Cloudflare Pages.
+- Full stack, schema, API contracts, env vars: **docs/tech-spec.md**.
+
+## Build Rules
+- Build current tier (Phase 1 MVP) screens only — see Out of Scope in docs/tech-spec.md and below.
+- One component per file.
+- No hardcoded values — use tokens from `src/styles/theme.css` and classes from guidelines (e.g. `.btn`, `.pill-tag`, `var(--color-primary)`).
+- All API calls must match contracts in docs/tech-spec.md Section 16.
+
+## Out of Scope (do not build until Phase 2/3 gates)
+- Phase 2 (after Day-30 cohort ≥ 200): affiliate order redirect, weekly/monthly report API, family journal archive, data-export, account hard-delete, reluctant_accept signal.
+- Phase 3 (after revenue signal): React Native app, blog scale 100+ articles, affiliate meal-kit, suy_than blog cluster.
+- See docs/tech-spec.md Section 21 for hard gates.
+
+## LLM Usage
+- Default to templates and SQL for deterministic logic. Health constraints: Rule Engine (TypeScript) only — no LLM.
+- LLM (Gemini 2.5 Flash) approved only for: adaptation copy, recipe tips, pantry NLP parsing. Cached per tech-spec.
+- Monthly inference cost ceiling: see docs/tech-spec.md Section 11 (target < $60/month at 3k users).

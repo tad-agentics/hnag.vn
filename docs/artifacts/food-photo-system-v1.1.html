@@ -1,0 +1,1026 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hôm Nay Ăn Gì — Food Photo Generation System v1.1</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,700;1,9..144,400;1,9..144,600&family=Be+Vietnam+Pro:ital,wght@0,400;0,500;0,600;1,400&subset=vietnamese&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:              #FEF8F1;
+  --surface:         #FFFDF9;
+  --surface-alt:     #F7EDE0;
+  --surface-warm:    #FDF3E3;
+  --primary:         #D9622B;
+  --primary-hover:   #BF5024;
+  --primary-light:   #FAEAE0;
+  --primary-border:  #F0CBBA;
+  --health:          #5A8A6A;
+  --health-light:    #E8F2EC;
+  --health-border:   #C0DACA;
+  --warn:            #C97B2A;
+  --warn-light:      #FEF3E2;
+  --warn-border:     #F0D5A0;
+  --error:           #C04030;
+  --error-light:     #FAEAE8;
+  --text-1:          #1E1410;
+  --text-2:          #6B5447;
+  --text-3:          #B09A8C;
+  --border:          #EAD8C8;
+  --border-strong:   #D4B8A5;
+  --f-display: "Fraunces", Georgia, serif;
+  --f-body:    "Be Vietnam Pro", "Helvetica Neue", sans-serif;
+  --f-mono:    "Be Vietnam Pro", "Helvetica Neue", sans-serif;
+  --r-sm: 6px; --r-md: 12px; --r-lg: 16px; --r-xl: 24px; --r-full: 9999px;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { background: var(--bg); color: var(--text-1); font-family: var(--f-body); font-size: 15px; line-height: 1.65; }
+.page { max-width: 1040px; margin: 0 auto; padding: 64px 40px 120px; }
+
+/* ── DOC HEADER ── */
+.doc-header { border-bottom: 1px solid var(--border); padding-bottom: 32px; margin-bottom: 64px; }
+.doc-eyebrow { font-family: var(--f-mono); font-size: 11px; color: var(--primary); letter-spacing: .15em; text-transform: uppercase; margin-bottom: 12px; }
+.doc-title { font-family: var(--f-display); font-size: 42px; font-weight: 600; color: var(--text-1); line-height: 1.2; margin-bottom: 8px; }
+.doc-subtitle { font-family: var(--f-body); font-size: 15px; color: var(--text-2); }
+.version-badge { display: inline-block; background: var(--primary-light); border: 1px solid var(--primary-border); color: var(--primary); font-family: var(--f-mono); font-size: 10px; font-weight: 500; letter-spacing: .1em; text-transform: uppercase; padding: 3px 10px; border-radius: var(--r-full); margin-left: 12px; vertical-align: middle; }
+
+/* ── SECTION ── */
+.section { margin-bottom: 80px; }
+.section-header { display: flex; align-items: baseline; gap: 16px; margin-bottom: 32px; padding-bottom: 16px; border-bottom: 1px solid var(--border); }
+.section-num { font-family: var(--f-mono); font-size: 11px; color: var(--text-3); letter-spacing: .1em; flex-shrink: 0; }
+.section-title { font-family: var(--f-display); font-size: 22px; font-weight: 600; color: var(--text-1); }
+
+/* ── CALLOUT ── */
+.callout { position: relative; border: 1px solid var(--border); border-radius: var(--r-lg); padding: 24px 24px 20px; margin-bottom: 24px; background: var(--surface); }
+.callout-label { position: absolute; top: -10px; left: 20px; background: var(--surface); padding: 0 8px; font-family: var(--f-mono); font-size: 10px; font-weight: 500; letter-spacing: .15em; text-transform: uppercase; color: var(--primary); border: 1px solid var(--border); border-radius: var(--r-full); }
+.callout.change { background: var(--primary-light); border-color: var(--primary-border); }
+.callout.change .callout-label { background: var(--primary-light); color: var(--primary); border-color: var(--primary-border); }
+.callout.warn { background: var(--warn-light); border-color: var(--warn-border); }
+.callout.warn .callout-label { background: var(--warn-light); color: var(--warn); border-color: var(--warn-border); }
+.callout p { font-size: 14px; color: var(--text-2); line-height: 1.7; }
+.callout strong { color: var(--text-1); font-weight: 600; }
+
+/* ── PROMPT BOX ── */
+.prompt-box { background: var(--text-1); border-radius: var(--r-lg); padding: 28px 32px; margin-bottom: 24px; overflow-x: auto; }
+.prompt-box pre { font-family: var(--f-mono); font-size: 13px; color: rgba(255,255,255,0.88); line-height: 1.85; white-space: pre-wrap; word-wrap: break-word; }
+.prompt-box .label { color: var(--primary); font-weight: 600; }
+.prompt-box .comment { color: rgba(255,255,255,0.35); }
+.prompt-box .variable { color: #E8C47A; }
+.prompt-box .highlight { color: #F0CBBA; font-weight: 500; }
+
+/* ── TABLE ── */
+.spec-table { width: 100%; border-collapse: collapse; margin-bottom: 24px; }
+.spec-table th { text-align: left; font-family: var(--f-mono); font-size: 10px; letter-spacing: .1em; text-transform: uppercase; color: var(--text-3); padding: 8px 16px; border-bottom: 1px solid var(--border); }
+.spec-table td { padding: 14px 16px; font-size: 13px; border-bottom: 1px solid var(--border); vertical-align: top; }
+.spec-table td:first-child { color: var(--text-1); font-weight: 500; width: 28%; }
+.spec-table td:last-child { color: var(--text-2); }
+.spec-table tr:last-child td { border-bottom: none; }
+
+/* ── CATEGORY CARDS ── */
+.category-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1px; background: var(--border); border: 1px solid var(--border); border-radius: var(--r-lg); overflow: hidden; margin-bottom: 24px; }
+.category-card { background: var(--surface); padding: 20px; }
+.category-card-title { font-family: var(--f-mono); font-size: 10px; font-weight: 500; letter-spacing: .12em; text-transform: uppercase; color: var(--primary); margin-bottom: 10px; }
+.category-card p { font-size: 13px; color: var(--text-2); line-height: 1.7; margin-bottom: 8px; }
+.category-card strong { color: var(--text-1); }
+
+/* ── EXAMPLE BOX ── */
+.example-box { border: 1px solid var(--border); border-radius: var(--r-lg); overflow: hidden; margin-bottom: 24px; }
+.example-header { background: var(--surface-alt); padding: 12px 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); }
+.example-dish { font-family: var(--f-display); font-size: 16px; font-weight: 600; color: var(--text-1); }
+.example-type { font-family: var(--f-mono); font-size: 9px; letter-spacing: .12em; text-transform: uppercase; color: var(--text-3); }
+.example-body { padding: 16px 20px; font-size: 13px; color: var(--text-2); line-height: 1.75; }
+
+/* ── CSS CODE BOX ── */
+.css-box { background: var(--text-1); border-radius: var(--r-lg); padding: 24px 28px; margin-bottom: 24px; overflow-x: auto; }
+.css-box pre { font-family: var(--f-mono); font-size: 12px; color: rgba(255,255,255,0.85); line-height: 1.8; white-space: pre-wrap; }
+.css-box .prop { color: #9DC8E8; }
+.css-box .val { color: #E8C47A; }
+.css-box .sel { color: var(--primary); font-weight: 500; }
+.css-box .cmt { color: rgba(255,255,255,0.35); }
+
+/* ── COMPARISON ── */
+.comparison { display: grid; grid-template-columns: 1fr 1fr; gap: 1px; border: 1px solid var(--border); border-radius: var(--r-lg); overflow: hidden; margin-bottom: 24px; }
+.comparison-col { background: var(--surface); padding: 20px; }
+.comparison-col:first-child { background: #FFF0EE; }
+.comparison-col-title { font-family: var(--f-mono); font-size: 9px; letter-spacing: .15em; text-transform: uppercase; margin-bottom: 14px; font-weight: 500; }
+.comparison-col:first-child .comparison-col-title { color: var(--error); }
+.comparison-col:last-child .comparison-col-title { color: var(--health); }
+.comparison-item { font-size: 13px; color: var(--text-2); padding: 8px 0; border-bottom: 1px solid var(--border); line-height: 1.5; }
+.comparison-item:last-child { border-bottom: none; }
+
+/* ── CHECKLIST ── */
+.checklist { margin-bottom: 24px; }
+.checklist-item { display: flex; gap: 10px; padding: 10px 0; border-bottom: 1px solid var(--border); font-size: 13px; color: var(--text-2); line-height: 1.6; }
+.checklist-item:last-child { border-bottom: none; }
+.check-icon { width: 18px; height: 18px; border-radius: 50%; flex-shrink: 0; margin-top: 2px; display: flex; align-items: center; justify-content: center; }
+.check-icon.required { background: var(--primary-light); border: 1px solid var(--primary-border); color: var(--primary); }
+.check-icon.optional { background: var(--surface-alt); border: 1px solid var(--border); color: var(--text-3); }
+.check-icon svg { width: 10px; height: 10px; }
+
+/* ── THREE-COL ── */
+.three-col { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1px; background: var(--border); border: 1px solid var(--border); border-radius: var(--r-lg); overflow: hidden; margin-bottom: 24px; }
+.three-col > div { background: var(--surface); padding: 20px; }
+.three-col .col-title { font-family: var(--f-mono); font-size: 10px; font-weight: 500; letter-spacing: .12em; text-transform: uppercase; color: var(--primary); margin-bottom: 10px; }
+.three-col p { font-size: 13px; color: var(--text-2); line-height: 1.7; }
+.three-col strong { color: var(--text-1); }
+
+/* ── FOOTER ── */
+.doc-footer { margin-top: 80px; padding-top: 24px; border-top: 1px solid var(--border); display: flex; justify-content: space-between; font-family: var(--f-mono); font-size: 10px; color: var(--text-3); }
+
+hr { border: none; border-top: 1px solid var(--border); margin: 32px 0; }
+
+@media (max-width: 768px) {
+  .page { padding: 24px 20px 60px; }
+  .doc-title { font-size: 28px; }
+  .category-grid, .comparison, .three-col { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+<div class="page">
+
+  <!-- ═══ HEADER ═══ -->
+  <div class="doc-header">
+    <div class="doc-eyebrow">Internal Design System Addendum</div>
+    <div>
+      <span class="doc-title">Food Photo Generation System</span>
+      <span class="version-badge">v1.1</span>
+    </div>
+    <div class="doc-subtitle" style="margin-top:8px;">AI image generation pipeline · System/user prompt architecture · CSS post-process · UI integration spec</div>
+    <div style="margin-top:16px;font-family:var(--f-mono);font-size:10px;color:var(--text-3);">March 2026 · Addendum to UI Design System v2.0 · Internal</div>
+  </div>
+
+
+  <!-- ═══ SECTION 00: OVERVIEW ═══ -->
+  <div class="section">
+    <div class="section-header">
+      <span class="section-num">00</span>
+      <span class="section-title">Architecture Overview</span>
+    </div>
+
+    <div class="callout">
+      <div class="callout-label">How It Works</div>
+      <p>Mỗi ảnh món ăn trong app được tạo qua 4 layer: <strong>(1) System Prompt</strong> — lock toàn bộ style + hướng dẫn AI cách dùng reference images, không bao giờ thay đổi. <strong>(2) Reference Images</strong> — 5 ảnh thật từ web, tự động thu thập per-dish, cho AI thấy nguyên liệu thật trông thế nào. <strong>(3) User Prompt</strong> — chỉ đạo composition và khóa garnish, 1-3 câu ngắn. <strong>(4) CSS Post-Process</strong> — light blur + warmth. Tỷ lệ đóng góp: system prompt 50% (style + reference instruction), reference images 30% (ingredient truth), user prompt 15% (composition + garnish), CSS 5%.</p>
+    </div>
+
+    <div class="category-grid">
+      <div class="category-card">
+        <div class="category-card-title">Layer 1 · System Prompt</div>
+        <p><strong>Locked.</strong> Controls framing, lighting, lens, food styling philosophy, strict rules, and reference image instruction. Set once in pipeline. Never modified per-dish.</p>
+      </div>
+      <div class="category-card">
+        <div class="category-card-title">Layer 2 · Reference Images</div>
+        <p><strong>Per-dish.</strong> 5 ảnh thật từ web. Mục đích duy nhất: cho AI thấy nguyên liệu thật trông thế nào — đúng loại, đúng màu, đúng texture khi nấu chín. Không dạy composition hay photography.</p>
+      </div>
+      <div class="category-card">
+        <div class="category-card-title">Layer 3 · User Prompt</div>
+        <p><strong>Per-dish.</strong> 1-3 câu ngắn. Chỉ đạo composition (hero là gì, ẩn gì) và khóa garnish. Không mô tả ingredient — references đã xử lý.</p>
+      </div>
+      <div class="category-card">
+        <div class="category-card-title">Layer 4 · CSS Post-Process</div>
+        <p><strong>Global.</strong> Applied via CSS class on every food image in the app. Soft blur + warm shift. Removes AI crispness, aligns with UI palette.</p>
+      </div>
+    </div>
+
+    <div style="margin-bottom:16px;font-family:var(--f-mono);font-size:10px;color:var(--text-3);letter-spacing:.1em;text-transform:uppercase;margin-top:32px;">Image Dimensions — Pipeline Defaults</div>
+
+    <table class="spec-table">
+      <tr>
+        <th>Context</th>
+        <th>Aspect Ratio</th>
+        <th>Generation Size</th>
+        <th>Notes</th>
+      </tr>
+      <tr>
+        <td>Swipe card</td>
+        <td>3:4 portrait</td>
+        <td>1024 × 1365</td>
+        <td>Primary use. Portrait fits card layout, object-fit:cover crops sides</td>
+      </tr>
+      <tr>
+        <td>Recipe detail hero</td>
+        <td>1:1 square</td>
+        <td>1024 × 1024</td>
+        <td>50/50 split layout. Square gives max flexibility for cover crop</td>
+      </tr>
+      <tr>
+        <td>Thumbnail / list</td>
+        <td>1:1 square</td>
+        <td>Resized from hero</td>
+        <td>Don't re-generate. Downscale hero image to 256×256</td>
+      </tr>
+      <tr>
+        <td>Social share / OG</td>
+        <td>16:9 landscape</td>
+        <td>1024 × 576</td>
+        <td>Optional. Generate separately if needed for marketing</td>
+      </tr>
+    </table>
+
+    <div class="callout">
+      <div class="callout-label">Pipeline Rule</div>
+      <p>Generate <strong>2 images per dish</strong>: one 3:4 (swipe card) and one 1:1 (hero/thumbnail). Do not generate landscape unless explicitly needed for marketing. Thumbnail is always a downscaled crop from the 1:1, never a separate generation.</p>
+    </div>
+  </div>
+
+
+  <!-- ═══ SECTION 01: REFERENCE IMAGE WORKFLOW ═══ -->
+  <div class="section">
+    <div class="section-header">
+      <span class="section-num">01</span>
+      <span class="section-title">Reference Images — Ingredient Authenticity</span>
+    </div>
+
+    <div class="callout change">
+      <div class="callout-label">Purpose — Narrow</div>
+      <p>References exist for <strong>one reason only: để nguyên liệu trong ảnh AI trông giống thật.</strong> AI không biết thịt cá lóc kho trông thế nào, nước canh chua màu gì, bún bò Huế có gân bò ra sao. 5 ảnh thật per dish cho AI thấy: nguyên liệu đúng loại, đúng màu, đúng texture khi đã nấu xong. Mọi thứ khác — framing, lighting, vessel, composition — vẫn do system prompt kiểm soát 100%.</p>
+    </div>
+
+    <div class="callout warn">
+      <div class="callout-label">Scope Lock</div>
+      <p>References <strong>KHÔNG</strong> teach composition, portion size, photography angle, vessel choice, lighting, hoặc background. Những thứ đó đã locked trong system prompt. Nếu AI bắt đầu copy style chụp ảnh từ references → system prompt block REFERENCE IMAGES chưa đủ mạnh, cần reinforce "ignore everything except ingredients."</p>
+    </div>
+
+    <!-- What references teach -->
+    <div style="margin-bottom:16px;font-family:var(--f-mono);font-size:10px;color:var(--text-3);letter-spacing:.1em;text-transform:uppercase;">References Teach — Chỉ Những Thứ Này</div>
+
+    <table class="spec-table">
+      <tr>
+        <th>Ingredient Attribute</th>
+        <th>Example</th>
+        <th>Why AI Needs This</th>
+      </tr>
+      <tr>
+        <td>Màu sắc nguyên liệu khi nấu chín</td>
+        <td>Thịt bò phở: hồng hiếm vs xám chín. Cá kho: nâu đậm caramel. Bún Bò: nước đỏ cam</td>
+        <td>AI thường sai màu — tạo broth quá trong, thịt quá đỏ, rau quá xanh</td>
+      </tr>
+      <tr>
+        <td>Texture bề mặt</td>
+        <td>Gân bò: trong suốt, dai. Da cá: nứt khi kho. Thịt ba chỉ: lớp mỡ mềm tan</td>
+        <td>AI tạo texture quá đồng nhất — thịt trông như nhựa, không có fiber/marbling</td>
+      </tr>
+      <tr>
+        <td>Loại nguyên liệu đúng</td>
+        <td>Canh Chua: bạc hà (dọc mùng), không phải celery. Bún Bò: huyết, không phải tofu</td>
+        <td>AI hay thay thế nguyên liệu Việt bằng nguyên liệu Western tương tự</td>
+      </tr>
+      <tr>
+        <td>Trạng thái nước dùng / sốt</td>
+        <td>Phở: trong vàng, oil layer mỏng. Bún Bò: đục đỏ cam, dầu ớt nổi. Kho: sệt, bóng</td>
+        <td>AI mặc định tạo nước trong — thiếu richness, thiếu oil, thiếu opacity đặc trưng</td>
+      </tr>
+      <tr>
+        <td>Hình dạng cắt / thái</td>
+        <td>Bò phở: lát mỏng. Cá kho: khúc dày. Rau muống xào: cắt khúc 5cm</td>
+        <td>AI không biết convention cắt thái của món Việt — hay tạo miếng quá to hoặc quá đều</td>
+      </tr>
+    </table>
+
+    <!-- Selection Criteria — simplified for ingredient focus -->
+    <div style="margin-bottom:16px;font-family:var(--f-mono);font-size:10px;color:var(--text-3);letter-spacing:.1em;text-transform:uppercase;margin-top:32px;">Chọn 5 Ảnh — Ưu Tiên Thấy Rõ Nguyên Liệu</div>
+
+    <div class="comparison">
+      <div class="comparison-col">
+        <div class="comparison-col-title">✕ Loại bỏ</div>
+        <div class="comparison-item">Ảnh quá xa — không thấy rõ nguyên liệu, chỉ thấy tô</div>
+        <div class="comparison-item">Ảnh filter nặng / Instagram — sai màu thật của nguyên liệu</div>
+        <div class="comparison-item">Ảnh sai món — search "Bún Bò" nhưng ra Phở (xảy ra thường xuyên)</div>
+        <div class="comparison-item">Ảnh quá bé (&lt;400px) hoặc quá mờ — AI không extract được ingredient detail</div>
+        <div class="comparison-item">Ảnh text/watermark che nguyên liệu</div>
+      </div>
+      <div class="comparison-col">
+        <div class="comparison-col-title">✓ Ưu tiên</div>
+        <div class="comparison-item">Thấy rõ từng nguyên liệu — protein, rau, nước dùng, garnish đều visible</div>
+        <div class="comparison-item">Màu tự nhiên, không filter — đúng màu nước, màu thịt, màu rau khi nấu</div>
+        <div class="comparison-item">Ảnh từ blog nấu ăn tiếng Việt — thường chính xác nguyên liệu nhất</div>
+        <div class="comparison-item">Nhiều variation — 5 ảnh khác nhau để AI hiểu "range" hình dạng món, không overfit 1 ảnh</div>
+        <div class="comparison-item">Ảnh homestyle, nấu tại nhà — đây là target aesthetic, không phải fine-dining</div>
+      </div>
+    </div>
+
+    <div class="callout warn">
+      <div class="callout-label">Fallback — Dưới 5 Ảnh</div>
+      <p><strong>Minimum 3 references.</strong> Nếu không tìm đủ 5 ảnh chất lượng (món regional ít phổ biến như Bánh Căn, Cơm Hến), chấp nhận 3 ảnh minimum — miễn cover được: ingredient types, broth/sauce color, và texture. Dưới 3 → fall back to detailed user prompt mô tả ingredient (như v1 style) thay thế cho references.</p>
+    </div>
+
+    <div class="callout">
+      <div class="callout-label">Moved to System Prompt</div>
+      <p>Reference instruction giờ nằm trong system prompt (Section 02, block REFERENCE IMAGES). <strong>User prompt không cần prepend reference instruction nữa</strong> — chỉ còn tên món + composition + garnish lock. Conditional phrasing "If reference images are provided..." đảm bảo system prompt vẫn hoạt động khi dish không có ảnh ref (&lt; 3 available).</p>
+    </div>
+
+    <!-- Full pipeline example — shortened -->
+    <div style="margin-bottom:16px;font-family:var(--f-mono);font-size:10px;color:var(--text-3);letter-spacing:.1em;text-transform:uppercase;margin-top:32px;">Full Pipeline Example — Canh Chua Cá Lóc</div>
+
+    <div class="prompt-box">
+      <pre><span class="label">LAYER 1: SYSTEM PROMPT</span>
+<span class="comment">/* Locked — same for every dish (see Section 02)
+   Includes REFERENCE IMAGES block — instructs AI
+   how to use refs for ingredient truth only */</span>
+
+<span class="label">LAYER 2: REFERENCE IMAGES</span>
+<span class="comment">/* 5 real photos showing what the ingredients look like */</span>
+<span class="variable">ref_1.jpg</span>  — cá lóc flesh in tamarind broth (ingredient color)
+<span class="variable">ref_2.jpg</span>  — shows bạc hà, pineapple, tomato (ingredient types)
+<span class="variable">ref_3.jpg</span>  — fish flesh texture + oily broth surface (texture)
+<span class="variable">ref_4.jpg</span>  — broth color: golden-orange, slightly cloudy (broth)
+<span class="variable">ref_5.jpg</span>  — different cook variation (ingredient range)
+
+<span class="label">LAYER 3: USER PROMPT</span>
+<span class="comment">/* Chỉ composition + garnish lock. Không reference instruction,
+   không ingredient description. */</span>
+
+<span class="highlight">Canh Chua Cá Lóc</span>
+Focus on one large chunk of fish breaking the surface.
+Most ingredients hidden beneath the broth. One red
+chili floating only.
+
+<span class="label">LAYER 4: CSS POST-PROCESS</span>
+<span class="comment">/* Applied automatically in UI — see Section 06 */</span></pre>
+    </div>
+
+    <!-- File naming — kept -->
+    <div style="margin-bottom:16px;font-family:var(--f-mono);font-size:10px;color:var(--text-3);letter-spacing:.1em;text-transform:uppercase;margin-top:32px;">File Organization</div>
+
+    <div class="prompt-box">
+      <pre><span class="comment">/* Folder structure for reference images */</span>
+
+<span class="label">references/</span>
+├── <span class="variable">pho-bo/</span>
+│   ├── ref_1.jpg
+│   ├── ref_2.jpg
+│   ├── ref_3.jpg
+│   ├── ref_4.jpg
+│   └── ref_5.jpg
+├── <span class="variable">ca-kho-to/</span>
+│   └── ...
+├── <span class="variable">canh-chua-ca-loc/</span>
+│   └── ...
+└── <span class="variable">[dish-slug]/</span>
+    └── ...
+
+<span class="comment">/* Slug: lowercase, dashes, no diacritics
+   "phở bò" → "pho-bo"
+   "cá kho tộ" → "ca-kho-to" */</span></pre>
+    </div>
+
+    <!-- Automation batch — kept but simplified -->
+    <div style="margin-bottom:16px;font-family:var(--f-mono);font-size:10px;color:var(--text-3);letter-spacing:.1em;text-transform:uppercase;margin-top:32px;">Batch Automation — 300+ Dishes</div>
+
+    <table class="spec-table">
+      <tr>
+        <th>Step</th>
+        <th>Manual / Auto</th>
+        <th>Notes</th>
+      </tr>
+      <tr>
+        <td>Image search</td>
+        <td>Automatable</td>
+        <td>Google Images API / SerpAPI. Query: "{tên món tiếng Việt}". Fetch top 15-20</td>
+      </tr>
+      <tr>
+        <td>Curation (5 từ 20)</td>
+        <td>Semi-auto</td>
+        <td>AI pre-filter (loại nhỏ, có text, sai món). Human final pick — focus: thấy rõ nguyên liệu?</td>
+      </tr>
+      <tr>
+        <td>Image generation</td>
+        <td>Automated</td>
+        <td>System prompt (includes reference instruction) + 5 refs + user prompt. Generate 3 variants</td>
+      </tr>
+      <tr>
+        <td>QA</td>
+        <td>Semi-auto</td>
+        <td>So sánh output vs references: nguyên liệu có đúng không? Màu nước lệch? Re-gen nếu fail</td>
+      </tr>
+    </table>
+
+    <div class="callout">
+      <div class="callout-label">Effort Estimate</div>
+      <p><strong>300 món × 5 refs = 1,500 ảnh</strong> cần thu thập. Semi-auto curation: ~2 phút/món = ~10 giờ. Generation: ~30s/dish = ~2.5 giờ. QA: ~1 phút/dish = ~5 giờ. <strong>Total: ~2 ngày cho 1 người.</strong></p>
+    </div>
+  </div>
+
+
+  <!-- ═══ SECTION 02: SYSTEM PROMPT ═══ -->
+  <div class="section">
+    <div class="section-header">
+      <span class="section-num">02</span>
+      <span class="section-title">System Prompt — Locked</span>
+    </div>
+
+    <div class="callout warn">
+      <div class="callout-label">Không Sửa</div>
+      <p>System prompt dưới đây là final. Không thay đổi theo từng món. Mọi variation nằm ở user prompt. Nếu cần sửa system prompt, phải test lại toàn bộ 6 dish categories (A–F) trước khi deploy.</p>
+    </div>
+
+    <div class="prompt-box">
+      <pre><span class="label">SYSTEM PROMPT</span>
+
+You are a food photography director. Generate images following
+this exact style specification for every dish:
+
+<span class="label">FRAMING:</span>
+Extreme close-up. A warm brown or cream stoneware bowl/plate,
+cropped so tight the rim is cut off at the bottom and sides
+of the frame — only the interior of the dish is visible. Shot
+from 25 degrees, almost level with the rim. Crumpled natural
+linen barely visible at top edge. Background must contain
+physical texture — visible linen weave, wood grain, or the
+edge of another object slightly out of focus. Never a smooth,
+clean, gradient-like background. The background should look
+like a real kitchen table, not a studio backdrop.
+
+<span class="label">FOOD STYLING:</span>
+Generous, overflowing portions — never minimalist plating.
+Everything looks wet, moist, glistening, freshly served, still
+settling. Visible oil sheen on broth/sauce surfaces catching
+the light. Ingredients tangled naturally, messy, overlapping —
+real homemade food, not restaurant-plated. The food must look
+delicious and appetizing above all else.
+
+<span class="label">LENS & FOCUS:</span>
+The image looks slightly out of focus everywhere — as if the
+autofocus missed slightly. Fine details like pepper granules,
+herb veins, and meat texture should blur together, not be
+individually resolved. Think f/1.8 focus missed by 2cm. The
+image should feel like it was captured quickly, not carefully
+focused. Never crisp, never tack-sharp.
+
+<span class="label">LIGHTING:</span>
+Warm backlight from behind and slightly right. Golden-amber
+tones throughout. Muted background, but the food itself stays
+vibrant and colorful.
+
+<span class="label">REFERENCE IMAGES:</span>
+If reference images are provided, they show what the real
+ingredients of this dish look like when cooked.
+<span class="highlight">Study them ONLY for:</span>
+— What the correct ingredients are
+— What color the ingredients become when cooked
+— What texture the surfaces have (glossy, matte, fibrous,
+  translucent, etc.)
+— What color and opacity the broth or sauce is
+— How the ingredients are cut or shaped
+
+<span class="highlight">IGNORE everything else from the references:</span> the photography
+angle, lighting, background, bowl/plate type, plating
+arrangement, and composition. These are controlled by the
+rules above. Generate ingredients that look like the
+references, but photographed entirely in our style.
+
+<span class="label">STRICT RULES:</span>
+No people. No hands. No text. No watermark. No cilantro or
+scallions unless specified. Maximum 2-3 garnish elements per
+dish — keep it simple. Never use green-tinted or white
+ceramic. Never produce a smooth gradient background. The ONLY
+garnish visible is what the user prompt specifies — nothing
+else whatsoever.</pre>
+    </div>
+  </div>
+
+
+  <!-- ═══ SECTION 03: USER PROMPT RULES ═══ -->
+  <div class="section">
+    <div class="section-header">
+      <span class="section-num">03</span>
+      <span class="section-title">User Prompt — Composition & Garnish Only</span>
+    </div>
+
+    <div class="callout change">
+      <div class="callout-label">Role Shift — V2</div>
+      <p>Với reference images, AI đã thấy nguyên liệu trông thế nào. User prompt <strong>không cần mô tả ingredient</strong> nữa — không cần "glossy dark caramel sauce," "pink rare beef," hay "golden-orange tamarind broth." Những thứ đó AI đã thấy trong ảnh thật. User prompt giờ chỉ còn <strong>2 việc: (1) chỉ đạo composition</strong> — cái gì là hero, cái gì ẩn, cái gì nổi — và <strong>(2) khóa garnish</strong> — liệt kê chính xác garnish cho phép, viết "only" để ngăn AI thêm.</p>
+    </div>
+
+    <div class="callout">
+      <div class="callout-label">Template</div>
+      <p>Mỗi user prompt = <strong>1-3 câu ngắn.</strong> Cấu trúc: <strong>[Tên món]</strong> → [Composition directive: hero là gì, ẩn gì, tỷ lệ gì] → [Garnish lock: liệt kê + "only"]</p>
+    </div>
+
+    <!-- Category rules -->
+    <div style="margin-bottom:16px;font-family:var(--f-mono);font-size:10px;color:var(--text-3);letter-spacing:.1em;text-transform:uppercase;">Category Composition Rules — 6 Loại Món</div>
+
+    <div class="category-grid">
+
+      <div class="category-card">
+        <div class="category-card-title">A · Món Nước / Canh / Soup</div>
+        <p>Phở, Bún Bò, Canh Chua, Hủ Tiếu, Mì Quảng...</p>
+        <p><strong>Composition:</strong> "Most ingredients hidden beneath the broth." Chỉ 1 protein nổi trên mặt. Nước dùng là hero — chiếm phần lớn visible area.</p>
+        <p><strong>Garnish lock:</strong> 1-2 items + "only"</p>
+      </div>
+
+      <div class="category-card">
+        <div class="category-card-title">B · Món Kho / Braised</div>
+        <p>Cá Kho Tộ, Thịt Kho Tàu, Sườn Kho, Gà Kho Gừng...</p>
+        <p><strong>Composition:</strong> Sauce pooling at bottom, protein glistening on top. Vessel override nếu cần: "in a small clay pot."</p>
+        <p><strong>Garnish lock:</strong> 1-2 lát ớt + tiêu + "only"</p>
+      </div>
+
+      <div class="category-card">
+        <div class="category-card-title">C · Món Xào / Stir-Fry</div>
+        <p>Rau Muống Xào Tỏi, Bò Xào, Gà Xào Sả Ớt, Mực Xào...</p>
+        <p><strong>Composition:</strong> "Piled high as if just tossed from a wok." Không flat, không arranged — messy, overlapping, abundant.</p>
+        <p><strong>Garnish lock:</strong> Món xào tự có garnish trong chính nó. Chỉ thêm 1 lát ớt nếu cần.</p>
+      </div>
+
+      <div class="category-card">
+        <div class="category-card-title">D · Món Hấp / Luộc / Nhẹ</div>
+        <p>Cá Hấp, Gà Luộc, Rau Luộc, Canh Rau...</p>
+        <p><strong>Composition:</strong> Protein centered. "Small dipping bowl of fish sauce beside it" nếu có nước chấm.</p>
+        <p><strong>Garnish lock:</strong> Hành lá + gừng thái sợi + "only"</p>
+        <p style="font-size:12px;color:var(--warn);margin-top:4px;"><strong>⚠ Exception:</strong> Category D is the only category where scallion/hành lá is permitted. Write it explicitly in the user prompt to override the system-level "no scallions" rule.</p>
+      </div>
+
+      <div class="category-card">
+        <div class="category-card-title">E · Cơm / Bát Cơm</div>
+        <p>Cơm Tấm, Cơm Gà, Cơm Sườn, Cơm Chiên...</p>
+        <p><strong>Composition:</strong> "Protein is the hero, rice is the base." Protein chiếm focus, cơm nền phía dưới.</p>
+        <p><strong>Garnish lock:</strong> Đồ chua + 1 lát ớt + "only"</p>
+      </div>
+
+      <div class="category-card">
+        <div class="category-card-title">F · Món Cuốn / Gỏi / Cold</div>
+        <p>Gỏi Cuốn, Bò Cuốn Lá Lốt, Gỏi Đu Đủ, Nem Rán...</p>
+        <p><strong>Composition:</strong> "Cut in half showing the layers inside." Nước chấm bên cạnh.</p>
+        <p><strong>Garnish lock:</strong> "Lettuce leaves beside" + "only"</p>
+      </div>
+
+    </div>
+
+    <div class="callout change">
+      <div class="callout-label">User Prompt Checklist</div>
+      <p>Mỗi user prompt phải pass qua checklist này trước khi submit:</p>
+    </div>
+
+    <div class="checklist">
+      <div class="checklist-item">
+        <div class="check-icon required"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg></div>
+        <div><strong>Tên món tiếng Việt</strong> — dòng đầu tiên, in đậm</div>
+      </div>
+      <div class="checklist-item">
+        <div class="check-icon required"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg></div>
+        <div><strong>Composition directive</strong> — hero là gì, cái gì ẩn, "piled high" / "hidden beneath broth" / "cut in half"</div>
+      </div>
+      <div class="checklist-item">
+        <div class="check-icon required"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg></div>
+        <div><strong>Garnish lock</strong> — liệt kê chính xác items cho phép, kết thúc bằng "only"</div>
+      </div>
+      <div class="checklist-item">
+        <div class="check-icon optional"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg></div>
+        <div><strong>Vessel override</strong> (nếu cần) — chỉ khi khác default (vd: "in a small clay pot" cho cá kho)</div>
+      </div>
+    </div>
+
+    <div class="callout warn">
+      <div class="callout-label">Không Làm</div>
+      <p>Không mô tả ingredient appearance trong user prompt. Không viết "glossy dark caramel sauce," "rich golden broth," "pink rare beef," "charred grill marks." References đã xử lý — viết thêm là thừa và có thể conflict với ảnh thật.</p>
+    </div>
+  </div>
+
+
+  <!-- ═══ SECTION 04: EXAMPLES ═══ -->
+  <div class="section">
+    <div class="section-header">
+      <span class="section-num">04</span>
+      <span class="section-title">User Prompt Examples — Per Category</span>
+    </div>
+
+    <div class="callout">
+      <div class="callout-label">Before / After</div>
+      <p>Mỗi example dưới đây chỉ gồm <strong>tên món + composition directive + garnish lock.</strong> Không mô tả ingredient vì reference images đã xử lý. So sánh với v1: Canh Chua cũ = 4 câu mô tả chi tiết, mới = 1-3 câu ngắn chỉ đạo.</p>
+    </div>
+
+    <div class="example-box">
+      <div class="example-header">
+        <div class="example-dish">Canh Chua Cá Lóc</div>
+        <div class="example-type">Category A · Soup</div>
+      </div>
+      <div class="example-body">
+        <strong>Canh Chua Cá Lóc</strong><br><br>
+        Focus on one large chunk of fish breaking the surface. Most ingredients hidden beneath the broth. One red chili floating only.
+      </div>
+    </div>
+
+    <div class="example-box">
+      <div class="example-header">
+        <div class="example-dish">Phở Bò</div>
+        <div class="example-type">Category A · Soup</div>
+      </div>
+      <div class="example-body">
+        <strong>Phở Bò</strong><br><br>
+        Beef slices draped over noodles as the hero, most noodles submerged beneath the broth. One basil sprig and two chili slices only.
+      </div>
+    </div>
+
+    <div class="example-box">
+      <div class="example-header">
+        <div class="example-dish">Bún Bò Huế</div>
+        <div class="example-type">Category A · Soup</div>
+      </div>
+      <div class="example-body">
+        <strong>Bún Bò Huế</strong><br><br>
+        One beef shank slice as the hero on top. Most ingredients hidden beneath the broth. One basil sprig and two thin banana blossom slices only.
+      </div>
+    </div>
+
+    <div class="example-box">
+      <div class="example-header">
+        <div class="example-dish">Cá Kho Tộ</div>
+        <div class="example-type">Category B · Braised</div>
+      </div>
+      <div class="example-body">
+        <strong>Cá Kho Tộ</strong><br><br>
+        Fish pieces as the hero, sauce pooling at the bottom of a small clay pot. Two sliced red chili and cracked black pepper only.
+      </div>
+    </div>
+
+    <div class="example-box">
+      <div class="example-header">
+        <div class="example-dish">Thịt Kho Tàu</div>
+        <div class="example-type">Category B · Braised</div>
+      </div>
+      <div class="example-body">
+        <strong>Thịt Kho Tàu</strong><br><br>
+        Pork belly cubes as the hero, halved hard-boiled eggs nestled among them. Sauce coating visible. Two sliced red chili only.
+      </div>
+    </div>
+
+    <div class="example-box">
+      <div class="example-header">
+        <div class="example-dish">Rau Muống Xào Tỏi</div>
+        <div class="example-type">Category C · Stir-Fry</div>
+      </div>
+      <div class="example-body">
+        <strong>Rau Muống Xào Tỏi</strong><br><br>
+        Piled high as if just tossed from a wok. One sliced red chili only.
+      </div>
+    </div>
+
+    <div class="example-box">
+      <div class="example-header">
+        <div class="example-dish">Cá Hấp Hành Gừng</div>
+        <div class="example-type">Category D · Steamed</div>
+      </div>
+      <div class="example-body">
+        <strong>Cá Hấp Hành Gừng</strong><br><br>
+        Whole fish centered on plate. A small dipping bowl of fish sauce beside it. Scallion strips and julienned ginger on top only.
+      </div>
+    </div>
+
+    <div class="example-box">
+      <div class="example-header">
+        <div class="example-dish">Cơm Tấm Sườn Bì Chả</div>
+        <div class="example-type">Category E · Rice</div>
+      </div>
+      <div class="example-body">
+        <strong>Cơm Tấm Sườn Bì Chả</strong><br><br>
+        Grilled pork chop is the hero, rice is the base beneath. Pickled daikon and carrot at the edge. One sliced red chili only.
+      </div>
+    </div>
+
+    <div class="example-box">
+      <div class="example-header">
+        <div class="example-dish">Gỏi Cuốn Tôm Thịt</div>
+        <div class="example-type">Category F · Fresh/Cold</div>
+      </div>
+      <div class="example-body">
+        <strong>Gỏi Cuốn Tôm Thịt</strong><br><br>
+        Two rolls cut in half showing the layers inside. A small bowl of peanut dipping sauce beside them. Lettuce leaves beside only.
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ═══ SECTION 05: COMMON PITFALLS ═══ -->
+  <div class="section">
+    <div class="section-header">
+      <span class="section-num">05</span>
+      <span class="section-title">Pitfalls & Fixes — Các Lỗi Thường Gặp</span>
+    </div>
+
+    <div class="comparison">
+      <div class="comparison-col">
+        <div class="comparison-col-title">✕ Sai</div>
+        <div class="comparison-item">Mô tả ingredient trong user prompt khi đã có references → redundant, có thể conflict với ảnh thật</div>
+        <div class="comparison-item">Liệt kê nhiều nguyên liệu trên mặt soup → model hiển thị tất cả, trông cluttered</div>
+        <div class="comparison-item">Viết "no cilantro, no scallions" → negative prompt yếu, model vẫn thêm</div>
+        <div class="comparison-item">User prompt quá dài (4+ câu) → model confused giữa references và text</div>
+        <div class="comparison-item">Dùng "minimalist" hoặc "clean plating" → phần ăn trông ít, không hấp dẫn</div>
+        <div class="comparison-item">Reference ảnh kém chất lượng (mờ, filter nặng, sai món) → AI học sai ingredient</div>
+      </div>
+      <div class="comparison-col">
+        <div class="comparison-col-title">✓ Đúng</div>
+        <div class="comparison-item">User prompt chỉ nói composition + garnish lock. References lo ingredient truth</div>
+        <div class="comparison-item">Viết "most ingredients hidden beneath the broth" — chỉ show 1-2 thứ nổi</div>
+        <div class="comparison-item">Viết "one basil sprig and two chili slices only" — positive + "only" enforces</div>
+        <div class="comparison-item">Giữ user prompt 1-3 câu. Composition directive + garnish lock. Hết.</div>
+        <div class="comparison-item">Viết "generous, overflowing portion" — system prompt đã enforce nhưng reinforce thêm</div>
+        <div class="comparison-item">Chọn reference ảnh rõ nguyên liệu, màu tự nhiên, từ food blogs tiếng Việt</div>
+      </div>
+    </div>
+
+    <div class="callout warn">
+      <div class="callout-label">Known Model Limitations</div>
+      <p>Có 2 thứ model AI luôn kháng cự dù prompt nào: <strong>(1) Sharpness</strong> — model mặc định tạo ảnh hyper-crisp. Prompt soft focus chỉ giảm ~50%. Giải quyết bằng CSS post-process layer. <strong>(2) Extra garnish</strong> — model thêm cilantro/scallion dù không yêu cầu. Dùng positive-only language ("only") thay vì negative. Chấp nhận ~80% compliance rate, re-generate nếu cần.</p>
+    </div>
+  </div>
+
+
+  <!-- ═══ SECTION 06: CSS POST-PROCESS ═══ -->
+  <div class="section">
+    <div class="section-header">
+      <span class="section-num">06</span>
+      <span class="section-title">CSS Post-Process Layer</span>
+    </div>
+
+    <div class="callout">
+      <div class="callout-label">Rationale</div>
+      <p>CSS filter áp dụng trên mọi ảnh món ăn trong app. Mục đích: <strong>(1)</strong> Giảm AI crispness bằng subtle Gaussian blur (1.5–2px). <strong>(2)</strong> Tăng nhẹ warmth và contrast. <strong>(3)</strong> Đảm bảo ảnh blend tự nhiên với UI palette. Filter cực nhẹ — không nên nhìn thấy bằng mắt thường. Nếu filter visible, nó quá mạnh.</p>
+    </div>
+
+    <div style="margin-bottom:16px;font-family:var(--f-mono);font-size:10px;color:var(--text-3);letter-spacing:.1em;text-transform:uppercase;">CSS Implementation</div>
+
+    <div class="css-box">
+      <pre><span class="cmt">/* ── FOOD PHOTO POST-PROCESS ──
+   Apply .food-photo to every AI-generated food image.
+   This is a GLOBAL class — not per-dish. ── */</span>
+
+<span class="sel">.food-photo</span> {
+  <span class="cmt">/* Subtle blur to reduce AI crispness + warm shift + micro contrast
+     blur(1px) = softens AI hyper-sharpness
+     brightness(1.02) = 2% brighter, avoids dull look from blur
+     contrast(1.04) = 4% more contrast, restores depth
+     saturate(1.03) = 3% more saturated, compensates blur wash-out */</span>
+  <span class="prop">filter</span>: <span class="val">blur(1px) brightness(1.02) contrast(1.04) saturate(1.03)</span>;
+
+  <span class="cmt">/* Prevent blur from bleeding outside image bounds */</span>
+  <span class="prop">overflow</span>: <span class="val">hidden</span>;
+  <span class="prop">border-radius</span>: <span class="val">inherit</span>;
+
+  <span class="cmt">/* GPU acceleration — ONLY on swipe cards (animated).
+     Do NOT apply will-change globally — it allocates a GPU
+     compositor layer per element. On history screens with
+     30+ thumbnails, this causes memory issues on low-end
+     Android. Only use on elements that animate. */</span>
+  <span class="prop">transform</span>: <span class="val">translateZ(0)</span>;
+}
+
+<span class="cmt">/* ── SCALE COMPENSATION ──
+   blur(1px) slightly shrinks perceived image size.
+   scale(1.01) compensates — prevents thin transparent edge. ── */</span>
+
+<span class="sel">.food-photo img</span>,
+<span class="sel">.food-photo-img</span> {
+  <span class="prop">display</span>: <span class="val">block</span>;
+  <span class="prop">width</span>: <span class="val">100%</span>;
+  <span class="prop">height</span>: <span class="val">100%</span>;
+  <span class="prop">object-fit</span>: <span class="val">cover</span>;
+  <span class="prop">transform</span>: <span class="val">scale(1.01)</span>;
+}
+
+<span class="cmt">/* ── VARIANT: SWIPE CARD ──
+   Rounded corners + animation perf.
+   will-change ONLY here — swipe cards are the only
+   animated food images. Do not add to thumbnails. ── */</span>
+
+<span class="sel">.swipe-card .food-photo</span> {
+  <span class="prop">border-radius</span>: <span class="val">var(--r-xl)</span>;  <span class="cmt">/* 24px — card corner radius */</span>
+  <span class="prop">overflow</span>: <span class="val">hidden</span>;
+  <span class="prop">will-change</span>: <span class="val">filter, transform</span>;
+}
+
+<span class="cmt">/* ── VARIANT: FULL-BLEED HERO (Recipe Detail) ──
+   Full-height photo panel, no rounded corners.
+   Slightly stronger blur OK since image is larger. ── */</span>
+
+<span class="sel">.recipe-hero .food-photo</span> {
+  <span class="prop">filter</span>: <span class="val">blur(1.5px) brightness(1.02) contrast(1.04) saturate(1.03)</span>;
+  <span class="prop">border-radius</span>: <span class="val">0</span>;
+}
+
+<span class="cmt">/* ── VARIANT: THUMBNAIL / HISTORY LIST ──
+   Small images (< 120px). Blur must be lighter. ── */</span>
+
+<span class="sel">.food-thumbnail .food-photo</span> {
+  <span class="prop">filter</span>: <span class="val">blur(0.5px) brightness(1.02) contrast(1.03) saturate(1.02)</span>;
+}
+
+<span class="cmt">/* ── DO NOT apply .food-photo to:
+   - UI screenshots
+   - Icons / illustrations
+   - User-uploaded photos (already real)
+   - Non-food imagery
+   Only AI-generated food images. ── */</span></pre>
+    </div>
+
+    <div style="margin-bottom:16px;font-family:var(--f-mono);font-size:10px;color:var(--text-3);letter-spacing:.1em;text-transform:uppercase;">Filter Values — Why These Numbers</div>
+
+    <table class="spec-table">
+      <tr>
+        <th>Property</th>
+        <th>Value</th>
+        <th>Rationale</th>
+      </tr>
+      <tr>
+        <td>blur</td>
+        <td>1px (card) · 1.5px (hero) · 0.5px (thumb)</td>
+        <td>Removes AI hyper-sharpness. 1px = barely visible trên phone. Hơn 2px = trông lỗi, không phải style</td>
+      </tr>
+      <tr>
+        <td>brightness</td>
+        <td>1.02 (+2%)</td>
+        <td>Compensate blur darkening. Blur averaging lowers perceived brightness — 2% recovers it</td>
+      </tr>
+      <tr>
+        <td>contrast</td>
+        <td>1.04 (+4%)</td>
+        <td>Blur flattens local contrast. 4% boost restores depth without clipping highlights</td>
+      </tr>
+      <tr>
+        <td>saturate</td>
+        <td>1.03 (+3%)</td>
+        <td>Blur desaturates slightly (averaging). 3% compensates. Giữ food colors vibrant</td>
+      </tr>
+      <tr>
+        <td>scale</td>
+        <td>1.01 (on img)</td>
+        <td>Blur creates ~1px transparent edge. Scale eliminates it. Invisible at 1%</td>
+      </tr>
+    </table>
+
+    <div class="callout warn">
+      <div class="callout-label">Không Tăng</div>
+      <p>Nếu ảnh trông "chưa đủ mềm," <strong>không tăng blur</strong>. Tăng blur trên 2px sẽ trông lỗi trên mobile. Thay vào đó, re-generate ảnh với prompt mạnh hơn. CSS layer chỉ shave off 10-15% AI crispness — không thay thế prompt quality.</p>
+    </div>
+  </div>
+
+
+  <!-- ═══ SECTION 07: UI INTEGRATION ═══ -->
+  <div class="section">
+    <div class="section-header">
+      <span class="section-num">07</span>
+      <span class="section-title">Photo–UI Integration — Blend-In Rules</span>
+    </div>
+
+    <div class="callout">
+      <div class="callout-label">Core Principle</div>
+      <p>Ảnh và UI share cùng color DNA. Không cần gradient overlay, không cần CSS blend mode. Ảnh tự blend vì prompt đã tạo ảnh có tông màu trùng với design tokens: <strong>linen = var(--bg) #FEF8F1</strong>, <strong>wood table = var(--text-1) #1E1410</strong>, <strong>food warmth = var(--primary) #D9622B</strong>. Hard edge giữa ảnh và UI là đúng — giống Food Mood.</p>
+    </div>
+
+    <div style="margin-bottom:16px;font-family:var(--f-mono);font-size:10px;color:var(--text-3);letter-spacing:.1em;text-transform:uppercase;">Photo Edge → UI Token Mapping</div>
+
+    <table class="spec-table">
+      <tr>
+        <th>Photo Edge Zone</th>
+        <th>Natural Color</th>
+        <th>UI Token Match</th>
+      </tr>
+      <tr>
+        <td>Linen cloth (top/top-right)</td>
+        <td>Warm cream, off-white</td>
+        <td>var(--bg) #FEF8F1 — exact match</td>
+      </tr>
+      <tr>
+        <td>Wood table (bottom/sides)</td>
+        <td>Dark walnut brown</td>
+        <td>var(--text-1) #1E1410 — near match</td>
+      </tr>
+      <tr>
+        <td>Bowl rim</td>
+        <td>Warm brown/cream ceramic</td>
+        <td>var(--border-strong) #D4B8A5 — harmonic</td>
+      </tr>
+      <tr>
+        <td>Food warmth (overall)</td>
+        <td>Golden-amber cast</td>
+        <td>var(--primary) #D9622B — same warmth family</td>
+      </tr>
+      <tr>
+        <td>Blurred background</td>
+        <td>Soft warm brown/cream bokeh</td>
+        <td>var(--surface-alt) #F7EDE0 — harmonic</td>
+      </tr>
+    </table>
+
+    <div style="margin-bottom:16px;font-family:var(--f-mono);font-size:10px;color:var(--text-3);letter-spacing:.1em;text-transform:uppercase;margin-top:32px;">Layout Rules — Where Photo Meets UI</div>
+
+    <div class="three-col">
+      <div>
+        <div class="col-title">Recipe Detail</div>
+        <p><strong>50/50 split.</strong> Photo sticky left, content scroll right. Hard edge, no gradient. Photo fills 100vh height, object-fit: cover. Ảnh bị crop ở right edge — OK, miễn center dish visible.</p>
+      </div>
+      <div>
+        <div class="col-title">Swipe Card</div>
+        <p><strong>Photo top, info bottom.</strong> Photo chiếm ~60% card height. border-radius: var(--r-xl). Hard edge at bottom where photo meets card body. Gradient overlay ở bottom 30% of photo for dish name text readability — CHỈ dùng gradient ở đây.</p>
+      </div>
+      <div>
+        <div class="col-title">History / List</div>
+        <p><strong>Thumbnail left, text right.</strong> 80×80px hoặc 64×64px. border-radius: var(--r-md). Ảnh nhỏ nên dùng .food-thumbnail variant (blur 0.5px). object-fit: cover, focus center.</p>
+      </div>
+    </div>
+
+    <div class="comparison">
+      <div class="comparison-col">
+        <div class="comparison-col-title">✕ Không làm</div>
+        <div class="comparison-item">Gradient overlay từ ảnh sang UI background</div>
+        <div class="comparison-item">CSS blend-mode trên ảnh (multiply, overlay, etc.)</div>
+        <div class="comparison-item">Tint layer warm trên ảnh — prompt đã xử lý warmth</div>
+        <div class="comparison-item">Box-shadow xung quanh ảnh — flat design, no shadow</div>
+        <div class="comparison-item">Border trắng/sáng quanh ảnh — break visual continuity</div>
+      </div>
+      <div class="comparison-col">
+        <div class="comparison-col-title">✓ Làm đúng</div>
+        <div class="comparison-item">Hard edge giữa photo và UI — clean, confident</div>
+        <div class="comparison-item">Chỉ .food-photo CSS class (blur + micro adjust)</div>
+        <div class="comparison-item">object-fit: cover để crop tự nhiên, center focus</div>
+        <div class="comparison-item">Swipe card only: gradient overlay cho text readability trên ảnh</div>
+        <div class="comparison-item">Border nếu cần = var(--border) #EAD8C8 — warm, subtle</div>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ═══ SECTION 08: QA CHECKLIST ═══ -->
+  <div class="section">
+    <div class="section-header">
+      <span class="section-num">08</span>
+      <span class="section-title">QA Checklist — Trước Khi Ship Ảnh</span>
+    </div>
+
+    <p style="font-size:14px;color:var(--text-2);margin-bottom:20px;">Mỗi ảnh generated phải pass 9/11 criteria dưới đây. Nếu fail 3+ items → re-generate. Không sửa bằng filter.</p>
+
+    <table class="spec-table">
+      <tr>
+        <th>#</th>
+        <th>Criteria</th>
+        <th>Pass Condition</th>
+      </tr>
+      <tr>
+        <td>1</td>
+        <td>Appetite appeal</td>
+        <td>Nhìn ảnh có muốn ăn không? Subjective nhưng là metric quan trọng nhất</td>
+      </tr>
+      <tr>
+        <td>2</td>
+        <td><strong>Ingredient accuracy</strong></td>
+        <td><strong>So sánh với 5 reference images: nguyên liệu đúng loại? Màu nước dùng/sốt đúng? Không có nguyên liệu lạ AI tự thêm?</strong></td>
+      </tr>
+      <tr>
+        <td>3</td>
+        <td>Crop tightness</td>
+        <td>Bowl rim bị cắt ít nhất 1 cạnh. Không thấy full bowl</td>
+      </tr>
+      <tr>
+        <td>4</td>
+        <td>Oil/moisture sheen</td>
+        <td>Có ít nhất 1 điểm light reflection trên broth/sauce/protein</td>
+      </tr>
+      <tr>
+        <td>5</td>
+        <td>Warm tone</td>
+        <td>Tổng thể ảnh warm amber. Không cool, không grey, không blue cast</td>
+      </tr>
+      <tr>
+        <td>6</td>
+        <td>Vessel color</td>
+        <td>Bowl/plate là warm brown, cream, hoặc clay. Không green, không white, không black</td>
+      </tr>
+      <tr>
+        <td>7</td>
+        <td>Garnish discipline</td>
+        <td>≤ 3 garnish items visible. Không scattered cilantro/scallion trừ khi specified</td>
+      </tr>
+      <tr>
+        <td>8</td>
+        <td>Background texture</td>
+        <td>Có visible linen hoặc wood grain. Không smooth gradient</td>
+      </tr>
+      <tr>
+        <td>9</td>
+        <td>Portion generosity</td>
+        <td>Bowl/plate looks full, abundant. Không sparse, không "diet portion"</td>
+      </tr>
+      <tr>
+        <td>10</td>
+        <td>No text/watermark</td>
+        <td>Không chữ, không watermark, không logo trong ảnh</td>
+      </tr>
+      <tr>
+        <td>11</td>
+        <td>Edge color compatibility</td>
+        <td>Rìa ảnh có tông warm cream/brown — sẽ blend được khi đặt cạnh UI var(--bg)</td>
+      </tr>
+    </table>
+  </div>
+
+
+  <!-- ═══ FOOTER ═══ -->
+  <div class="doc-footer">
+    <span>Hôm Nay Ăn Gì · Food Photo Generation System v1.1 · March 2026</span>
+    <span>Internal Use Only · Addendum to UI Design System v2.0</span>
+  </div>
+
+</div>
+</body>
+</html>

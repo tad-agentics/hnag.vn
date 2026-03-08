@@ -1,0 +1,727 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hôm Nay Ăn Gì — Northstar</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: #fff;
+    color: #1a1a1a;
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    line-height: 1.65;
+  }
+
+  .page {
+    max-width: 780px;
+    margin: 0 auto;
+    padding: 48px 32px 80px;
+  }
+
+  /* HEADER */
+  .doc-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    padding-bottom: 24px;
+    border-bottom: 2px solid #1a1a1a;
+    margin-bottom: 36px;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+
+  .doc-title {
+    font-size: 22px;
+    font-weight: 600;
+    line-height: 1.2;
+    margin-bottom: 4px;
+  }
+
+  .doc-subtitle {
+    font-size: 14px;
+    color: #555;
+  }
+
+  .doc-info {
+    text-align: right;
+    font-size: 12px;
+    color: #888;
+    line-height: 1.8;
+    flex-shrink: 0;
+  }
+
+  .status-badge {
+    display: inline-block;
+    background: #1a1a1a;
+    color: #fff;
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 3px 8px;
+    border-radius: 3px;
+    margin-top: 4px;
+  }
+
+  /* SECTION */
+  .section { margin-bottom: 40px; }
+
+  .section-title {
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: #888;
+    margin-bottom: 16px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid #e5e5e5;
+  }
+
+  /* STATS ROW */
+  .stats-row {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1px;
+    background: #e5e5e5;
+    border: 1px solid #e5e5e5;
+    border-radius: 6px;
+    overflow: hidden;
+    margin-bottom: 40px;
+  }
+
+  .stat {
+    background: #fff;
+    padding: 20px;
+    text-align: center;
+  }
+
+  .stat-number {
+    font-size: 28px;
+    font-weight: 600;
+    color: #1a1a1a;
+    line-height: 1;
+    margin-bottom: 6px;
+  }
+
+  .stat-label {
+    font-size: 12px;
+    color: #888;
+    line-height: 1.4;
+  }
+
+  /* PROBLEM */
+  .problem-list { display: flex; flex-direction: column; gap: 1px; }
+
+  .problem-item {
+    background: #f8f8f8;
+    padding: 16px 20px;
+    display: grid;
+    grid-template-columns: 28px 1fr;
+    gap: 16px;
+    align-items: start;
+  }
+
+  .problem-item.highlight {
+    background: #1a1a1a;
+    color: #fff;
+  }
+
+  .problem-num {
+    font-size: 12px;
+    font-weight: 600;
+    color: #bbb;
+    padding-top: 1px;
+  }
+
+  .problem-item.highlight .problem-num { color: #555; }
+
+  .problem-text strong {
+    display: block;
+    font-size: 14px;
+    font-weight: 600;
+    margin-bottom: 4px;
+  }
+
+  .problem-item.highlight .problem-text strong { color: #fff; }
+
+  .problem-text p {
+    font-size: 13px;
+    color: #555;
+    line-height: 1.6;
+  }
+
+  .problem-item.highlight .problem-text p { color: #999; }
+
+  /* PERSONA */
+  .persona-box {
+    border: 1px solid #e5e5e5;
+    border-radius: 6px;
+    padding: 24px;
+  }
+
+  .persona-header {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 16px;
+  }
+
+  .persona-avatar {
+    width: 44px;
+    height: 44px;
+    background: #1a1a1a;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    font-weight: 600;
+    font-size: 18px;
+    flex-shrink: 0;
+  }
+
+  .persona-name { font-weight: 600; font-size: 15px; }
+  .persona-role { font-size: 12px; color: #888; margin-top: 2px; }
+
+  .persona-quote {
+    font-size: 15px;
+    font-style: italic;
+    color: #333;
+    border-left: 3px solid #1a1a1a;
+    padding-left: 16px;
+    margin-bottom: 16px;
+    line-height: 1.6;
+  }
+
+  .tags { display: flex; flex-wrap: wrap; gap: 6px; }
+
+  .tag {
+    font-size: 12px;
+    padding: 3px 10px;
+    border-radius: 3px;
+    background: #f0f0f0;
+    color: #444;
+  }
+
+  .tag.pain {
+    background: #fff3f0;
+    color: #c0392b;
+    border: 1px solid #fbd5cf;
+  }
+
+  /* PILLARS */
+  .pillars-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1px;
+    background: #e5e5e5;
+    border: 1px solid #e5e5e5;
+    border-radius: 6px;
+    overflow: hidden;
+  }
+
+  .pillar {
+    background: #fff;
+    padding: 20px;
+  }
+
+  .pillar-num {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    color: #bbb;
+    margin-bottom: 10px;
+  }
+
+  .pillar-title {
+    font-size: 14px;
+    font-weight: 600;
+    margin-bottom: 8px;
+    line-height: 1.3;
+  }
+
+  .pillar-desc {
+    font-size: 13px;
+    color: #555;
+    line-height: 1.6;
+    margin-bottom: 12px;
+  }
+
+  .pillar-note {
+    font-size: 11px;
+    color: #888;
+    padding-top: 10px;
+    border-top: 1px solid #f0f0f0;
+  }
+
+  /* MOAT TABLE */
+  .moat-table { width: 100%; border-collapse: collapse; }
+
+  .moat-table tr { border-bottom: 1px solid #e5e5e5; }
+  .moat-table tr:last-child { border-bottom: none; }
+
+  .moat-table td {
+    padding: 12px 16px;
+    vertical-align: top;
+    font-size: 13px;
+  }
+
+  .moat-table td:first-child {
+    font-weight: 600;
+    width: 200px;
+    color: #1a1a1a;
+    white-space: nowrap;
+  }
+
+  .moat-table td:last-child { color: #555; }
+
+  .moat-table tr:nth-child(odd) td { background: #fafafa; }
+
+  /* PRICING */
+  .pricing-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1px;
+    background: #e5e5e5;
+    border: 1px solid #e5e5e5;
+    border-radius: 6px;
+    overflow: hidden;
+  }
+
+  .pricing-col { background: #fff; padding: 24px; }
+
+  .pricing-col-title {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: #888;
+    margin-bottom: 16px;
+  }
+
+  .price-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    padding: 10px 0;
+    border-bottom: 1px solid #f0f0f0;
+  }
+
+  .price-row:last-of-type { border-bottom: none; }
+
+  .price-name { font-size: 13px; color: #333; }
+
+  .price-amount {
+    font-size: 16px;
+    font-weight: 600;
+    color: #1a1a1a;
+  }
+
+  .kpi-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    padding: 10px 0;
+    border-bottom: 1px solid #f0f0f0;
+  }
+
+  .kpi-row:last-child { border-bottom: none; }
+  .kpi-label { font-size: 13px; color: #555; }
+  .kpi-val { font-size: 14px; font-weight: 600; }
+
+  /* PHASES */
+  .phase-table { width: 100%; border-collapse: collapse; }
+
+  .phase-table th {
+    text-align: left;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: #888;
+    padding: 8px 16px;
+    background: #f8f8f8;
+    border-bottom: 1px solid #e5e5e5;
+  }
+
+  .phase-table td {
+    padding: 14px 16px;
+    vertical-align: top;
+    font-size: 13px;
+    border-bottom: 1px solid #f0f0f0;
+  }
+
+  .phase-table tr:last-child td { border-bottom: none; }
+  .phase-table td:first-child { font-weight: 600; white-space: nowrap; width: 110px; }
+  .phase-table td:nth-child(3) { color: #888; white-space: nowrap; }
+
+  .phase-deliverable {
+    color: #777;
+    margin-top: 4px;
+    font-size: 12px;
+    line-height: 1.6;
+  }
+
+  /* NORTH STAR */
+  .northstar {
+    background: #1a1a1a;
+    color: #fff;
+    border-radius: 6px;
+    padding: 32px;
+    text-align: center;
+  }
+
+  .northstar-label {
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: #555;
+    margin-bottom: 14px;
+  }
+
+  .northstar-statement {
+    font-size: clamp(17px, 2.5vw, 21px);
+    font-weight: 500;
+    line-height: 1.55;
+    color: #fff;
+    max-width: 520px;
+    margin: 0 auto 14px;
+  }
+
+  .northstar-sub {
+    font-size: 13px;
+    color: #666;
+    max-width: 460px;
+    margin: 0 auto;
+    line-height: 1.7;
+  }
+
+  /* FOOTER */
+  .footer {
+    margin-top: 48px;
+    padding-top: 16px;
+    border-top: 1px solid #e5e5e5;
+    display: flex;
+    justify-content: space-between;
+    font-size: 11px;
+    color: #bbb;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  /* RESPONSIVE */
+  @media (max-width: 600px) {
+    .page { padding: 24px 20px 60px; }
+    .doc-meta { flex-direction: column; }
+    .doc-info { text-align: left; }
+    .stats-row { grid-template-columns: 1fr; }
+    .pillars-grid { grid-template-columns: 1fr; }
+    .pricing-grid { grid-template-columns: 1fr; }
+    .moat-table td:first-child { white-space: normal; width: auto; }
+    .phase-table th:nth-child(3),
+    .phase-table td:nth-child(3) { display: none; }
+    .doc-title { font-size: 18px; }
+  }
+
+  @media print {
+    .page { padding: 24px; }
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <!-- HEADER -->
+  <div class="doc-meta">
+    <div>
+      <div class="doc-title">Hôm Nay Ăn Gì — Northstar</div>
+      <div class="doc-subtitle">AI Food Decision Engine cho gia đình Việt · hnag.vn</div>
+    </div>
+    <div class="doc-info">
+      Internal · Updated March 2026<br>
+      Version 1.1<br>
+      <span class="status-badge">Northstar Doc</span>
+    </div>
+  </div>
+
+  <!-- DOC HIERARCHY NOTICE -->
+  <div style="margin-bottom:32px;padding:12px 16px;background:#f8f8f8;border-radius:6px;font-size:12px;color:#555;line-height:1.7;border-left:3px solid #1a1a1a;">
+    <strong style="color:#1a1a1a;display:block;margin-bottom:4px;font-size:10px;letter-spacing:.12em;text-transform:uppercase;">Document Hierarchy</strong>
+    <strong style="color:#1a1a1a;">Tài liệu này:</strong> Northstar tổng thể — product vision, business model, execution phases. &nbsp;|&nbsp;
+    <strong style="color:#1a1a1a;">Emotional Design System:</strong> Northstar cho UX + brand voice. &nbsp;|&nbsp;
+    <strong style="color:#1a1a1a;">UI Design System v2:</strong> Northstar cho everything UI (color, type, icons).
+    <br><span style="color:#aaa;font-size:11px;">Conflict rule: Tài liệu này định hướng what to build và why. Các doc kia định hướng how it looks và how it feels.</span>
+  </div>
+
+  <!-- STATS -->
+  <div class="stats-row">
+    <div class="stat">
+      <div class="stat-number">365×</div>
+      <div class="stat-label">Câu hỏi được hỏi mỗi năm trong mỗi gia đình</div>
+    </div>
+    <div class="stat">
+      <div class="stat-number">7M+</div>
+      <div class="stat-label">Bệnh nhân tiểu đường tại VN — chỉ 1 segment</div>
+    </div>
+    <div class="stat">
+      <div class="stat-number">~40%</div>
+      <div class="stat-label">Hộ gia đình VN có ít nhất 1 người bệnh mãn tính cần kiêng ăn</div>
+    </div>
+  </div>
+
+  <!-- THE PROBLEM -->
+  <div class="section">
+    <div class="section-title">Bài Toán</div>
+    <div class="problem-list">
+      <div class="problem-item">
+        <div class="problem-num">01</div>
+        <div class="problem-text">
+          <strong>Decision fatigue sau 8 tiếng làm việc</strong>
+          <p>Phụ nữ đi làm về nhà với cognitive bandwidth gần như bằng 0. "Chiều nay nấu gì" rơi đúng vào thời điểm tệ nhất trong ngày — khi não đã depleted hoàn toàn.</p>
+        </div>
+      </div>
+      <div class="problem-item">
+        <div class="problem-num">02</div>
+        <div class="problem-text">
+          <strong>Bài toán đa biến không có công cụ phù hợp</strong>
+          <p>Cân bằng bệnh lý — dị ứng — sở thích — thời gian — ngân sách của 3–4 người cùng lúc. ChatGPT trả lời được 1 lần nhưng không tối ưu liên tục và không nhớ lịch sử.</p>
+        </div>
+      </div>
+      <div class="problem-item">
+        <div class="problem-num">03</div>
+        <div class="problem-text">
+          <strong>Nguyên liệu trong tủ không được tận dụng</strong>
+          <p>Mở tủ lạnh thấy thịt heo, cà chua, trứng — nhưng không biết nấu được gì, còn thiếu gì, phải đi mua thêm bao nhiêu. Kết quả: gọi đồ ăn hoặc nấu lại món cũ dù đã có nguyên liệu.</p>
+        </div>
+      </div>
+      <div class="problem-item highlight">
+        <div class="problem-num">→</div>
+        <div class="problem-text">
+          <strong>Ba bài toán, một người phải giải mỗi ngày</strong>
+          <p>Ngay cả khi gọi đồ ăn, bài toán bệnh lý không mất đi — chỉ shift sang dạng khác. Chưa có công cụ nào giải đồng thời cả ba: ai có thể ăn gì, nấu từ những gì đang có, và ra quyết định trong 60 giây khi não đã hết pin.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TARGET USER -->
+  <div class="section">
+    <div class="section-title">Target User — Primary Persona</div>
+    <div class="persona-box">
+      <div class="persona-header">
+        <div class="persona-avatar">M</div>
+        <div>
+          <div class="persona-name">Minh, 34 tuổi — TP.HCM</div>
+          <div class="persona-role">Đi làm full-time · Nấu ăn chính · Caregiver cho cả gia đình</div>
+        </div>
+      </div>
+      <div class="persona-quote">
+        "Tôi có 40 phút, 150k, và không biết trong tủ còn gì — nấu gì cho cả nhà ăn mà không ai phàn nàn?"
+      </div>
+      <div class="tags">
+        <span class="tag">1 con 5 tuổi</span>
+        <span class="tag">Mẹ chồng huyết áp cao</span>
+        <span class="tag">Về nhà 6:15pm</span>
+        <span class="tag">Gọi đồ ăn 2–3 lần/tuần</span>
+        <span class="tag pain">Stress về bữa ăn 3–4 lần/tuần</span>
+        <span class="tag pain">Vẫn lo dinh dưỡng dù gọi đồ ăn</span>
+        <span class="tag pain">Mở tủ lạnh xong vẫn không biết nấu gì</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- SECONDARY PERSONA NOTE -->
+  <div class="section" style="margin-top:-20px;">
+    <div style="padding:12px 16px;background:#f8f8f8;border-radius:6px;font-size:12px;color:#666;line-height:1.7;border-left:3px solid #e5e5e5;">
+      <strong style="color:#1a1a1a;">Secondary persona:</strong> Nội trợ đã mua nguyên liệu sẵn, muốn tối ưu thay vì lãng phí — trực tiếp hưởng lợi từ Chế Độ Tủ Lạnh. Cùng trigger, khác timing trong ngày.
+    </div>
+  </div>
+
+  <!-- 3 PILLARS -->
+  <div class="section">
+    <div class="section-title">Ba Trụ Cột Sản Phẩm</div>
+    <div class="pillars-grid">
+      <div class="pillar">
+        <div class="pillar-num">PILLAR 01</div>
+        <div class="pillar-title">Knowledge Base Món Việt</div>
+        <div class="pillar-desc">300–500 món phổ biến với nutritional data chuẩn hóa. Rule engine bệnh lý cứng: gout, tiểu đường, dạ dày, huyết áp — tham chiếu từ Viện Dinh Dưỡng Quốc Gia. LLM chỉ generate ngôn ngữ, không tự quyết định constraint y tế. Mỗi món có ingredient mapping (nguyên liệu bắt buộc vs. tuỳ chọn) — nền tảng cho Chế Độ Tủ Lạnh và shopping list tự động.</div>
+        <div class="pillar-note">Moat: data + rule engine không thể clone trong 3–6 tháng</div>
+      </div>
+      <div class="pillar">
+        <div class="pillar-num">PILLAR 02</div>
+        <div class="pillar-title">Tinder UX — Swipe to Decide</div>
+        <div class="pillar-desc">Mỗi bữa = stack cards ảnh món AI-gen. Swipe phải chọn, trái bỏ. Quyết định trong 60 giây, zero cognitive load. Chế Độ Tủ Lạnh tích hợp trực tiếp vào deck: một tap từ home → chọn nguyên liệu đang có → deck re-sort tức thì (Tầng 0: nấu ngay, Tầng 1: mua thêm 1 thứ). S-07 summary hiện full ingredient list với strikethrough những gì đã có — chỉ cần mua phần còn thiếu.</div>
+        <div class="pillar-note">Mỗi swipe = preference signal · Tủ Lạnh = persistent (pantry data lưu theo profile, không phải session)</div>
+      </div>
+      <div class="pillar">
+        <div class="pillar-num">PILLAR 03</div>
+        <div class="pillar-title">Family Memory Engine</div>
+        <div class="pillar-desc">App học từ hành vi: nhớ con không ăn cà rốt, nhớ tuần trước vừa nấu canh chua, nhớ thứ Sáu cần gợi ý nhanh. Sau 30 ngày dùng — hiểu gia đình bạn hơn bất kỳ công cụ nào. Switching cost tăng theo thời gian, tạo retention tự nhiên mà không cần gamification.</div>
+        <div class="pillar-note">Target: Day-30 retention &gt; 35%</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MOAT -->
+  <div class="section">
+    <div class="section-title">Competitive Moat</div>
+    <table class="moat-table">
+      <tr>
+        <td>Persistent Family Profile</td>
+        <td>ChatGPT không nhớ lịch sử gia đình bạn. App này thì có — càng dùng càng chính xác hơn. Switching cost tăng tự nhiên theo thời gian mà không cần gamification.</td>
+      </tr>
+      <tr>
+        <td>Hard-coded Rule Engine</td>
+        <td>Constraint bệnh lý không để AI "suy luận" — quá rủi ro. Rule engine tách biệt, target accuracy 85%+ cho gout, tiểu đường, dạ dày, huyết áp — xác thực dần qua bộ test cases internal.</td>
+      </tr>
+      <tr>
+        <td>Ingredient Gap Optimisation</td>
+        <td>Biết bạn đang có gì, tính ra bạn cần mua thêm ít nhất để nấu bữa tốt nhất — với health filter vẫn chạy ngầm. Không đối thủ nào ở VN đang làm intersection này.</td>
+      </tr>
+      <tr>
+        <td>Serve cả Nấu & Gọi</td>
+        <td>Không bị displace khi user chọn không nấu. Relevant 7 ngày/tuần — không phải 3–4 ngày như meal planning thuần túy.</td>
+      </tr>
+      <tr>
+        <td>Behavioral Flywheel</td>
+        <td>Mỗi swipe cải thiện recommendation. Network effect cá nhân: user càng dùng lâu, app càng khó bỏ và khó thay thế bằng free tool.</td>
+      </tr>
+      <tr>
+        <td>SEO Content Moat</td>
+        <td>Dinh Dưỡng Blog (W-07) build topical authority cho gout · tiểu đường · huyết áp · trẻ em — những từ khoá có search intent cao và conversion thẳng vào app. Organic acquisition không cần paid budget giai đoạn đầu.</td>
+      </tr>
+    </table>
+  </div>
+
+  <!-- BUSINESS MODEL -->
+  <div class="section">
+    <div class="section-title">Business Model</div>
+    <div class="pricing-grid">
+      <div class="pricing-col">
+        <div class="pricing-col-title">Pricing — Tâm Lý Việt Nam</div>
+        <div class="price-row">
+          <div>
+            <div class="price-name">Gói 6 tháng</div>
+            <div style="font-size:11px;color:#aaa;margin-top:2px;">Entry point</div>
+          </div>
+          <div class="price-amount">990k</div>
+        </div>
+        <div class="price-row">
+          <div>
+            <div class="price-name">Gói 12 tháng</div>
+            <div style="font-size:11px;color:#aaa;margin-top:2px;">Best value</div>
+          </div>
+          <div class="price-amount">1.690k</div>
+        </div>
+        <div class="price-row">
+          <div>
+            <div class="price-name">Lifetime</div>
+            <div style="font-size:11px;color:#aaa;margin-top:2px;">"Đầu tư cho gia đình"</div>
+          </div>
+          <div class="price-amount">2.990k</div>
+        </div>
+        <div style="margin-top:14px;font-size:12px;color:#888;line-height:1.6;padding:12px;background:#f8f8f8;border-radius:4px;">
+          Không auto-charge. Không subscription anxiety. Phù hợp tâm lý tiêu dùng Việt Nam.<br>
+          <span style="color:#aaa;font-size:11px;">Revenue assumption: mix 50% gói 12T · 30% gói 6T · 20% Lifetime → avg ~1.500k/user</span>
+        </div>
+      </div>
+      <div class="pricing-col">
+        <div class="pricing-col-title">Year 1 Targets</div>
+        <div class="kpi-row">
+          <div class="kpi-label">Paying users</div>
+          <div class="kpi-val">3.000</div>
+        </div>
+        <div class="kpi-row">
+          <div class="kpi-label">Revenue (avg 1.500k/user)</div>
+          <div class="kpi-val">~4.5 tỷ VND</div>
+        </div>
+        <div class="kpi-row">
+          <div class="kpi-label">Day-30 retention</div>
+          <div class="kpi-val">&gt; 35%</div>
+        </div>
+        <div class="kpi-row">
+          <div class="kpi-label">Affiliate (post-MVP)</div>
+          <div class="kpi-val">ShopeeFood · Grab</div>
+        </div>
+        <div class="kpi-row">
+          <div class="kpi-label">Trigger affiliate sau</div>
+          <div class="kpi-val">1.000 users</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PHASES -->
+  <div class="section">
+    <div class="section-title">Execution — MVP</div>
+    <table class="phase-table">
+      <thead>
+        <tr>
+          <th>Module</th>
+          <th>Deliverables</th>
+          <th>Gate</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Foundation<br><span style="font-weight:400;color:#aaa;font-size:12px;">Core data + logic</span></td>
+          <td>
+            <div>Knowledge Base + Rule Engine</div>
+            <div class="phase-deliverable">300 món Việt · Ingredient mapping (bắt buộc vs. tuỳ chọn) · Rule engine bệnh lý (gout · tiểu đường · huyết áp · dạ dày) · Family profile onboarding 3 câu hỏi</div>
+          </td>
+          <td rowspan="4" style="vertical-align:middle;text-align:center;">
+            <div style="font-weight:600;font-size:13px;color:#1a1a1a;">Day-30<br>retention<br>&gt; 35%</div>
+            <div style="font-size:11px;color:#aaa;margin-top:6px;">Primary gate</div>
+            <div style="margin-top:12px;font-size:11px;color:#aaa;border-top:1px solid #e5e5e5;padding-top:10px;">Post-MVP trigger:<br>1.000 users<br>→ affiliate</div>
+          </td>
+        </tr>
+        <tr>
+          <td>Swipe UX<br><span style="font-weight:400;color:#aaa;font-size:12px;">Core interaction</span></td>
+          <td>
+            <div>Tinder UX + Tủ Lạnh</div>
+            <div class="phase-deliverable">Swipe card UI · Haptic feedback &lt; 300ms · First card health tag · Chế Độ Tủ Lạnh: bottom sheet + deck re-sort + delta indicator Tầng 0/1 · S-07 strikethrough (đã có / cần mua) · Bottom nav: Hôm nay · Gia đình · Cài đặt</div>
+          </td>
+        </tr>
+        <tr>
+          <td>Memory + UX<br><span style="font-weight:400;color:#aaa;font-size:12px;">Retention engine</span></td>
+          <td>
+            <div>Family Memory Engine + Emotional UX</div>
+            <div class="phase-deliverable">Behavioral memory · Cool-down logic · Ngày chăm sóc counter (chỉ cộng, không reset) · S-07 micro-recognition (30+ copy variants, context-aware) · Memory Engine signal sau bữa thứ 10 · Opt-in reminder (user tự set, không default push)</div>
+          </td>
+        </tr>
+        <tr>
+          <td>Growth<br><span style="font-weight:400;color:#aaa;font-size:12px;">Distribution</span></td>
+          <td>
+            <div>Content + Acquisition + Soft Launch</div>
+            <div class="phase-deliverable">Dinh Dưỡng Blog W-07 (SEO cluster: gout · tiểu đường · huyết áp · trẻ em) · 2 bài/tuần · TikTok demo · Referral program · Soft launch · ShopeeFood/Grab affiliate sau 1.000 users</div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- NORTH STAR -->
+  <div class="northstar">
+    <div class="northstar-label">North Star Statement</div>
+    <div class="northstar-statement">
+      Trở thành công cụ mà mỗi gia đình Việt không thể tưởng tượng bữa ăn mà thiếu nó — dù nấu hay gọi.
+    </div>
+    <div class="northstar-sub">
+      Không phải app nấu ăn. Không phải app dinh dưỡng. Đây là người trợ lý biết gia đình bạn — hiểu bệnh của mẹ chồng, biết con không ăn cà rốt, nhớ tuần trước vừa ăn canh chua rồi, và biết tối nay trong tủ còn gì để nấu.
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <div class="footer">
+    <span>v1.1 · March 2026 · Validation In Progress</span>
+    <span>Internal Use Only</span>
+  </div>
+
+</div>
+</body>
+</html>

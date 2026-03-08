@@ -1,0 +1,11 @@
+---
+description: Pre-commit smoke check for any screen — call with @testing before committing
+alwaysApply: false
+---
+
+Before committing any screen, verify:
+- Component renders without errors in default state
+- All interaction states covered: default / loading / error / empty
+- Data variables inject correctly with real values (not placeholders)
+- Passes on mobile viewport (375px)
+- Navigation: enters from correct screen, exits to correct screen

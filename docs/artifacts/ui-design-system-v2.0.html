@@ -1,0 +1,1888 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hôm Nay Ăn Gì — UI Design System v2.0</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,700;1,9..144,400;1,9..144,600&family=Be+Vietnam+Pro:ital,wght@0,400;0,500;0,600;1,400&subset=vietnamese&display=swap" rel="stylesheet">
+<style>
+:root {
+  /* === PALETTE V2 — Food Mood Aligned === */
+  --bg:              #FEF8F1;   /* Warm cream — primary canvas */
+  --surface:         #FFFDF9;   /* Card/panel — barely-white warm */
+  --surface-alt:     #F7EDE0;   /* Input fields, muted sections */
+  --surface-warm:    #FDF3E3;   /* Highlighted section bg */
+
+  --primary:         #D9622B;   /* Terracotta — single accent, all actions */
+  --primary-hover:   #BF5024;   /* Pressed/hover state */
+  --primary-light:   #FAEAE0;   /* Tint backgrounds */
+  --primary-border:  #F0CBBA;   /* Tint borders */
+
+  /* No blue, no cool gray, no secondary accent fighting primary */
+  --health:          #5A8A6A;   /* Sage green — health safe only */
+  --health-light:    #E8F2EC;
+  --health-border:   #C0DACA;
+
+  --warn:            #C97B2A;   /* Amber — caution */
+  --warn-light:      #FEF3E2;
+  --warn-border:     #F0D5A0;
+
+  --error:           #C04030;   /* Error — not used decoratively */
+  --error-light:     #FAEAE8;
+
+  --text-1:          #1E1410;   /* Primary — warm near-black */
+  --text-2:          #6B5447;   /* Secondary — muted warm brown */
+  --text-3:          #B09A8C;   /* Disabled/placeholder */
+
+  --border:          #EAD8C8;   /* Default border */
+  --border-strong:   #D4B8A5;   /* Dividers, selected */
+  --border-accent:   #D9622B;   /* Accent border */
+
+  /* === TYPOGRAPHY === */
+  --f-display: "Fraunces", Georgia, serif;
+  --f-body:    "Be Vietnam Pro", "Helvetica Neue", sans-serif;
+  --f-mono:    "Be Vietnam Pro", "Helvetica Neue", sans-serif; /* No mono — Be Vietnam Pro + tracking */
+
+  /* === SPACING (4px base) === */
+  --s1: 4px; --s2: 8px; --s3: 12px; --s4: 16px;
+  --s5: 20px; --s6: 24px; --s8: 32px; --s10: 40px;
+  --s12: 48px; --s16: 64px;
+
+  /* === RADIUS === */
+  --r-sm: 6px; --r-md: 12px; --r-lg: 16px;
+  --r-xl: 24px; --r-full: 9999px;
+
+  /* === ELEVATION: FLAT — border only, no box-shadow === */
+  /* Shadow used ONLY for bottom sheet / modal overlay */
+  --shadow-overlay: 0 -4px 32px rgba(30, 20, 16, 0.10);
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  background: var(--bg);
+  color: var(--text-1);
+  font-family: var(--f-body);
+  font-size: 15px;
+  line-height: 1.65;
+}
+
+.page {
+  max-width: 1040px;
+  margin: 0 auto;
+  padding: 64px 40px 120px;
+}
+
+/* ── DOC HEADER ── */
+.doc-header {
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 32px;
+  margin-bottom: 64px;
+}
+
+.doc-eyebrow {
+  font-family: var(--f-mono);
+  font-size: 11px;
+  color: var(--primary);
+  letter-spacing: .15em;
+  text-transform: uppercase;
+  margin-bottom: 12px;
+}
+
+.doc-title {
+  font-family: var(--f-display);
+  font-size: 42px;
+  font-weight: 600;
+  color: var(--text-1);
+  line-height: 1.2;
+  margin-bottom: 8px;
+}
+
+.doc-subtitle {
+  font-family: var(--f-body);
+  font-size: 15px;
+  color: var(--text-2);
+}
+
+.version-badge {
+  display: inline-block;
+  background: var(--primary-light);
+  border: 1px solid var(--primary-border);
+  color: var(--primary);
+  font-family: var(--f-mono);
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  padding: 3px 10px;
+  border-radius: var(--r-full);
+  margin-left: 12px;
+  vertical-align: middle;
+}
+
+/* ── SECTION ── */
+.section { margin-bottom: 80px; }
+
+.section-header {
+  display: flex;
+  align-items: baseline;
+  gap: 16px;
+  margin-bottom: 32px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--border);
+}
+
+.section-num {
+  font-family: var(--f-mono);
+  font-size: 11px;
+  color: var(--text-3);
+  letter-spacing: .1em;
+  flex-shrink: 0;
+}
+
+.section-title {
+  font-family: var(--f-display);
+  font-size: 22px;
+  font-weight: 600;
+  color: var(--text-1);
+}
+
+/* ── CALLOUT BOXES — Food Mood style ── */
+.callout {
+  position: relative;
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  padding: 24px 24px 20px;
+  margin-bottom: 24px;
+  background: var(--surface);
+}
+
+.callout-label {
+  position: absolute;
+  top: -10px;
+  left: 20px;
+  background: var(--surface);
+  padding: 0 8px;
+  font-family: var(--f-mono);
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: .15em;
+  text-transform: uppercase;
+  color: var(--primary);
+  border: 1px solid var(--border);
+  border-radius: var(--r-full);
+}
+
+.callout.change {
+  background: var(--primary-light);
+  border-color: var(--primary-border);
+}
+
+.callout.change .callout-label {
+  background: var(--primary-light);
+  color: var(--primary);
+  border-color: var(--primary-border);
+}
+
+.callout.warn {
+  background: var(--warn-light);
+  border-color: var(--warn-border);
+}
+
+.callout.warn .callout-label {
+  background: var(--warn-light);
+  color: var(--warn);
+  border-color: var(--warn-border);
+  top: -10px;
+}
+
+.callout p { font-size: 14px; color: var(--text-2); line-height: 1.7; }
+.callout strong { color: var(--text-1); font-weight: 600; }
+
+/* ── DIFF TABLE ── */
+.diff-table { width: 100%; border-collapse: collapse; margin-bottom: 24px; }
+.diff-table th {
+  text-align: left;
+  font-family: var(--f-mono);
+  font-size: 10px;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--text-3);
+  padding: 8px 16px;
+  border-bottom: 1px solid var(--border);
+}
+.diff-table td {
+  padding: 14px 16px;
+  font-size: 13px;
+  border-bottom: 1px solid var(--border);
+  vertical-align: top;
+}
+.diff-table td:first-child { color: var(--text-2); width: 28%; font-weight: 500; }
+.diff-table td.del {
+  background: #FFF0EE;
+  color: var(--error);
+  text-decoration: line-through;
+  font-family: var(--f-mono);
+  font-size: 12px;
+}
+.diff-table td.add {
+  background: var(--health-light);
+  color: var(--health);
+  font-family: var(--f-mono);
+  font-size: 12px;
+  font-weight: 500;
+}
+.diff-table tr:last-child td { border-bottom: none; }
+
+/* ── COLOR PALETTE ── */
+.palette-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+.swatch {
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+  overflow: hidden;
+}
+
+.swatch-color {
+  height: 64px;
+}
+
+.swatch-info {
+  background: var(--surface);
+  padding: 8px 10px;
+}
+
+.swatch-name {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-1);
+  margin-bottom: 2px;
+}
+
+.swatch-hex {
+  font-family: var(--f-mono);
+  font-size: 10px;
+  color: var(--text-3);
+}
+
+.swatch-role {
+  font-size: 10px;
+  color: var(--text-2);
+  margin-top: 2px;
+}
+
+/* ── TYPE SPECIMENS ── */
+.type-row {
+  padding: 20px 0;
+  border-bottom: 1px solid var(--border);
+  display: grid;
+  grid-template-columns: 200px 1fr auto;
+  gap: 24px;
+  align-items: center;
+}
+
+.type-row:last-child { border-bottom: none; }
+.type-meta { font-family: var(--f-mono); font-size: 10px; color: var(--text-3); }
+.type-sample { color: var(--text-1); }
+.type-usage { font-size: 12px; color: var(--text-2); text-align: right; max-width: 160px; }
+
+/* ── ICON GRID ── */
+.icon-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+.icon-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 16px 8px;
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+  background: var(--surface);
+}
+
+.icon-item svg {
+  color: var(--primary);
+}
+
+.icon-item.on-dark {
+  background: var(--primary);
+}
+
+.icon-item.on-dark svg {
+  color: white;
+}
+
+.icon-name {
+  font-family: var(--f-mono);
+  font-size: 9px;
+  color: var(--text-3);
+  text-align: center;
+  line-height: 1.4;
+}
+
+/* ── COMPONENT DEMOS ── */
+.component-section {
+  margin-bottom: 48px;
+}
+
+.component-label {
+  font-family: var(--f-mono);
+  font-size: 10px;
+  color: var(--text-3);
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  margin-bottom: 16px;
+}
+
+/* Button component */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  height: 52px;
+  padding: 0 32px;
+  border-radius: var(--r-full);
+  font-family: var(--f-body);
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  transition: all 150ms ease;
+  text-decoration: none;
+}
+
+.btn-primary {
+  background: var(--primary);
+  color: white;
+  border: 2px solid var(--primary);
+}
+
+.btn-primary:hover {
+  background: var(--primary-hover);
+  border-color: var(--primary-hover);
+}
+
+.btn-outline {
+  background: transparent;
+  color: var(--primary);
+  border: 2px solid var(--primary);
+}
+
+.btn-ghost {
+  background: transparent;
+  color: var(--text-2);
+  border: 1px solid var(--border-strong);
+}
+
+.btn-sm {
+  height: 40px;
+  padding: 0 20px;
+  font-size: 13px;
+}
+
+/* Pill tag */
+.tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  height: 32px;
+  padding: 0 12px;
+  border-radius: var(--r-full);
+  font-family: var(--f-body);
+  font-size: 12px;
+  font-weight: 500;
+  border: 1px solid;
+}
+
+.tag-default { background: var(--surface-alt); color: var(--text-2); border-color: var(--border); }
+.tag-primary { background: var(--primary-light); color: var(--primary); border-color: var(--primary-border); }
+.tag-health { background: var(--health-light); color: var(--health); border-color: var(--health-border); }
+.tag-warn { background: var(--warn-light); color: var(--warn); border-color: var(--warn-border); }
+.tag-error { background: var(--error-light); color: var(--error); border-color: #F0C0BC; }
+
+/* Swipe card demo */
+.card-demo {
+  width: 220px;
+  border-radius: var(--r-xl);
+  overflow: hidden;
+  border: 1px solid var(--border-strong);
+  background: var(--surface);
+}
+
+.card-demo-img {
+  height: 180px;
+  background: linear-gradient(135deg, #8B5E3C, #C4834A, #D4956A);
+  position: relative;
+  display: flex;
+  align-items: flex-end;
+  padding: 16px;
+}
+
+.card-demo-img::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top, rgba(30,20,16,0.7) 0%, transparent 55%);
+}
+
+.card-demo-dish {
+  position: relative;
+  z-index: 1;
+  font-family: var(--f-display);
+  font-size: 16px;
+  font-weight: 700;
+  color: white;
+  line-height: 1.2;
+}
+
+.card-demo-body {
+  padding: 12px 14px;
+}
+
+/* Callout Food Mood style */
+.fm-callout {
+  position: relative;
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  padding: 20px 20px 16px;
+  margin-bottom: 16px;
+}
+
+.fm-label {
+  position: absolute;
+  top: -10px;
+  right: 16px;
+  font-family: var(--f-mono);
+  font-size: 9px;
+  letter-spacing: .18em;
+  text-transform: uppercase;
+  color: var(--primary);
+  background: var(--bg);
+  padding: 2px 10px;
+  border: 1px solid var(--border);
+  border-radius: var(--r-full);
+}
+
+.fm-callout p { font-size: 13px; color: var(--text-2); line-height: 1.7; }
+
+/* ── PHONE MOCK ── */
+.phone-showcase {
+  display: flex;
+  gap: 32px;
+  align-items: flex-start;
+  flex-wrap: wrap;
+}
+
+.phone-mock {
+  width: 200px;
+  border: 1.5px solid var(--text-1);
+  border-radius: 28px;
+  overflow: hidden;
+  background: var(--surface);
+  flex-shrink: 0;
+}
+
+.phone-mock .status-bar {
+  display: flex;
+  justify-content: space-between;
+  padding: 6px 14px;
+  font-size: 8px;
+  color: var(--text-2);
+  background: var(--bg);
+  border-bottom: 1px solid var(--border);
+}
+
+.phone-content {
+  padding: 0;
+}
+
+.phone-nav-bar {
+  padding: 10px 14px 6px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* ── SPACING DISPLAY ── */
+.spacing-row {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 10px;
+}
+
+.spacing-box {
+  background: var(--primary-light);
+  border: 1px solid var(--primary-border);
+  flex-shrink: 0;
+}
+
+.spacing-label {
+  font-family: var(--f-mono);
+  font-size: 11px;
+  color: var(--text-2);
+  width: 80px;
+}
+
+.spacing-val {
+  font-family: var(--f-mono);
+  font-size: 11px;
+  color: var(--text-3);
+}
+
+/* ── FOOD MOOD COMPARISON ── */
+.comparison {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1px;
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  overflow: hidden;
+  margin-bottom: 24px;
+}
+
+.comparison-col {
+  background: var(--surface);
+  padding: 24px;
+}
+
+.comparison-col:first-child {
+  background: #FFF0EE;
+  border-right: 1px solid var(--border);
+}
+
+.comparison-col-title {
+  font-family: var(--f-mono);
+  font-size: 9px;
+  letter-spacing: .15em;
+  text-transform: uppercase;
+  margin-bottom: 16px;
+  font-weight: 500;
+}
+
+.comparison-col:first-child .comparison-col-title { color: var(--error); }
+.comparison-col:last-child .comparison-col-title { color: var(--health); }
+
+.comparison-item {
+  font-size: 13px;
+  color: var(--text-2);
+  padding: 8px 0;
+  border-bottom: 1px solid var(--border);
+  line-height: 1.5;
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+}
+
+.comparison-item:last-child { border-bottom: none; }
+.comparison-item code { 
+  font-family: var(--f-mono);
+  font-size: 11px;
+  background: rgba(0,0,0,0.05);
+  padding: 1px 5px;
+  border-radius: 3px;
+}
+
+/* ── FOOTER ── */
+.doc-footer {
+  margin-top: 80px;
+  padding-top: 24px;
+  border-top: 1px solid var(--border);
+  display: flex;
+  justify-content: space-between;
+  font-family: var(--f-mono);
+  font-size: 10px;
+  color: var(--text-3);
+}
+
+/* Wave divider — Food Mood style */
+.wave-divider {
+  text-align: center;
+  margin: 32px 0;
+  color: var(--primary);
+  opacity: 0.5;
+}
+
+hr { border: none; border-top: 1px solid var(--border); margin: 32px 0; }
+
+/* Two-column layout */
+.two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-bottom: 24px; }
+.three-col { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; margin-bottom: 24px; }
+
+</style>
+</head>
+<body>
+<div class="page">
+
+  <!-- HEADER -->
+  <div class="doc-header">
+    <div class="doc-eyebrow">UI Design System — Source of Truth</div>
+    <div>
+      <span class="doc-title">Hôm Nay Ăn Gì</span>
+      <span class="version-badge">v2.0</span>
+    </div>
+    <div class="doc-subtitle" style="margin-top:8px;">Source of truth cho mọi visual decision — màu sắc, typography, icon, spacing, components · Food Mood alignment · Flat · Feminine · Non-techy</div>
+    <div style="margin-top:16px;font-family:var(--f-mono);font-size:10px;color:var(--text-3);">March 2026 · Internal Review Document</div>
+  </div>
+
+  <!-- DOC HIERARCHY NOTICE -->
+  <div style="margin-bottom:48px;padding:14px 20px;background:var(--primary-light);border:1px solid var(--primary-border);border-radius:var(--r-md);font-size:12px;color:var(--text-2);line-height:1.7;">
+    <strong style="color:var(--text-1);display:block;margin-bottom:6px;font-family:var(--f-mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;">Document Hierarchy</strong>
+    <strong style="color:var(--primary);">Tài liệu này:</strong> Northstar cho everything UI — màu sắc, typography, icon, spacing, components. &nbsp;|&nbsp;
+    <strong style="color:var(--primary);">Emotional Design System:</strong> Northstar cho UX principles + brand voice + copy. &nbsp;|&nbsp;
+    <strong style="color:var(--primary);">Northstar Onepager:</strong> Product vision + business model.
+    <br><span style="color:var(--text-3);font-size:11px;">Conflict rule: Tài liệu này là source of truth cho mọi visual decision. Mọi doc khác phải dùng token từ đây.</span>
+  </div>
+  <div class="section">
+    <div class="section-header">
+      <span class="section-num">00</span>
+      <span class="section-title">Food Mood Reference — Điểm Rút Ra</span>
+    </div>
+
+    <div class="callout">
+      <div class="callout-label">Context</div>
+      <p>Food Mood là reference không hoàn toàn identical với use case — nó là recipe explorer, không phải decision engine. Nhưng nó solve đúng aesthetic cần học: <strong>flat, feminine, editorial, non-techy</strong>. 3 điểm học được từ Food Mood:</p>
+    </div>
+
+    <div class="comparison">
+      <div class="comparison-col">
+        <div class="comparison-col-title">✕ V1 vi phạm</div>
+        <div class="comparison-item">Emoji thay thế icon — 🌙 🌤 ☀️ 🍖 🧠 🔥 — không consistent, không scalable, không brand</div>
+        <div class="comparison-item">Shadows trên card wireframes — <code>box-shadow</code> tạo depth không cần thiết, trông techy</div>
+        <div class="comparison-item">Pure black <code>#1a1a1a</code> dùng làm nền CTA button — quá harsh, không feminine</div>
+        <div class="comparison-item">Wireframe dùng <code>#1a1a1a</code> trên toàn bộ — không phân biệt với design system token</div>
+        <div class="comparison-item">Accent màu xanh lá <code>#4A8C6A</code> và cam <code>#E8673A</code> cạnh tranh nhau — visual noise</div>
+      </div>
+      <div class="comparison-col">
+        <div class="comparison-col-title">✓ V2 áp dụng</div>
+        <div class="comparison-item">SVG icon set đơn màu — 1.5px stroke, rounded, tất cả dùng <code>currentColor</code> → màu theo context</div>
+        <div class="comparison-item">Flat hoàn toàn — depth tạo qua border color variation, không shadow (ngoại trừ overlay/modal)</div>
+        <div class="comparison-item">CTA button dùng <code>--primary: #D9622B</code> terracotta — warm, recognizable, không harsh</div>
+        <div class="comparison-item">Sage green reserve cho health indicators only — không dùng cho action/navigation</div>
+        <div class="comparison-item">Single accent rule: <strong>mọi thứ interactive = terracotta</strong>. Green = health. Gold = premium. Không gì khác.</div>
+      </div>
+    </div>
+
+    <div class="callout warn">
+      <div class="callout-label">Critical Fix</div>
+      <p><strong>Emoji trong wireframes là blocker lớn nhất.</strong> Wireframes hiện tại dùng 🌙 🌤 ☀️ 🍖 🥩 🍜 🥦 🧠 🔥 🎉 ⏰ — những thứ này không consistent về size, không consistent về màu, trông như prototype vội không phải product design. Food Mood không có một emoji nào. Toàn bộ phải replace bằng SVG icon đồng màu.</p>
+    </div>
+  </div>
+
+
+  <!-- ═══ SECTION 1: COLOR ═══ -->
+  <div class="section">
+    <div class="section-header">
+      <span class="section-num">01</span>
+      <span class="section-title">Color — Tinh Chỉnh Palette</span>
+    </div>
+
+    <div class="callout">
+      <div class="callout-label">Thay Đổi Chính</div>
+      <p>Primary terracotta điều chỉnh từ <code>#E8673A</code> → <code>#D9622B</code> (đậm hơn 10%, đọc tốt hơn trên nền cream, ít neon hơn). Sage green giữ nguyên nhưng role được restrict chặt hơn. Palette V2 không có blue, không có cool gray, không có neutral white.</p>
+    </div>
+
+    <div style="margin-bottom:16px;font-family:var(--f-mono);font-size:10px;color:var(--text-3);letter-spacing:.1em;text-transform:uppercase;">Primary Palette</div>
+    <div class="palette-grid">
+      <div class="swatch">
+        <div class="swatch-color" style="background:#FEF8F1;"></div>
+        <div class="swatch-info">
+          <div class="swatch-name">bg</div>
+          <div class="swatch-hex">#FEF8F1</div>
+          <div class="swatch-role">Canvas, app bg</div>
+        </div>
+      </div>
+      <div class="swatch">
+        <div class="swatch-color" style="background:#FFFDF9;"></div>
+        <div class="swatch-info">
+          <div class="swatch-name">surface</div>
+          <div class="swatch-hex">#FFFDF9</div>
+          <div class="swatch-role">Card background</div>
+        </div>
+      </div>
+      <div class="swatch">
+        <div class="swatch-color" style="background:#F7EDE0;"></div>
+        <div class="swatch-info">
+          <div class="swatch-name">surface-alt</div>
+          <div class="swatch-hex">#F7EDE0</div>
+          <div class="swatch-role">Input, muted area</div>
+        </div>
+      </div>
+      <div class="swatch">
+        <div class="swatch-color" style="background:#D9622B;"></div>
+        <div class="swatch-info">
+          <div class="swatch-name">primary</div>
+          <div class="swatch-hex">#D9622B</div>
+          <div class="swatch-role">ALL actions, CTAs</div>
+        </div>
+      </div>
+      <div class="swatch">
+        <div class="swatch-color" style="background:#FAEAE0;"></div>
+        <div class="swatch-info">
+          <div class="swatch-name">primary-light</div>
+          <div class="swatch-hex">#FAEAE0</div>
+          <div class="swatch-role">Tag bg, tints</div>
+        </div>
+      </div>
+      <div class="swatch">
+        <div class="swatch-color" style="background:#5A8A6A;"></div>
+        <div class="swatch-info">
+          <div class="swatch-name">health</div>
+          <div class="swatch-hex">#5A8A6A</div>
+          <div class="swatch-role">Health safe ONLY</div>
+        </div>
+      </div>
+      <div class="swatch">
+        <div class="swatch-color" style="background:#C9933A;"></div>
+        <div class="swatch-info">
+          <div class="swatch-name">gold</div>
+          <div class="swatch-hex">#C9933A</div>
+          <div class="swatch-role">Premium badge only</div>
+        </div>
+      </div>
+      <div class="swatch">
+        <div class="swatch-color" style="background:#1E1410;"></div>
+        <div class="swatch-info">
+          <div class="swatch-name">text-1</div>
+          <div class="swatch-hex">#1E1410</div>
+          <div class="swatch-role">Primary text</div>
+        </div>
+      </div>
+      <div class="swatch">
+        <div class="swatch-color" style="background:#6B5447;"></div>
+        <div class="swatch-info">
+          <div class="swatch-name">text-2</div>
+          <div class="swatch-hex">#6B5447</div>
+          <div class="swatch-role">Secondary, body</div>
+        </div>
+      </div>
+      <div class="swatch">
+        <div class="swatch-color" style="background:#EAD8C8;"></div>
+        <div class="swatch-info">
+          <div class="swatch-name">border</div>
+          <div class="swatch-hex">#EAD8C8</div>
+          <div class="swatch-role">Default divider</div>
+        </div>
+      </div>
+    </div>
+
+    <div style="margin-bottom:16px;font-family:var(--f-mono);font-size:10px;color:var(--text-3);letter-spacing:.1em;text-transform:uppercase;margin-top:32px;">Color Usage Rules — Non-Negotiable</div>
+
+    <table class="diff-table">
+      <tr>
+        <th>Context</th>
+        <th>V1 (trước)</th>
+        <th>V2 (sau)</th>
+      </tr>
+      <tr>
+        <td>CTA button</td>
+        <td class="del">#1a1a1a (near-black)</td>
+        <td class="add">#D9622B (terracotta primary)</td>
+      </tr>
+      <tr>
+        <td>Active nav tab</td>
+        <td class="del">#1a1a1a border</td>
+        <td class="add">#D9622B border bottom</td>
+      </tr>
+      <tr>
+        <td>Trial ribbon</td>
+        <td class="del">#c97b2a amber (gold)</td>
+        <td class="add">#D9622B primary — trial = urgent action</td>
+      </tr>
+      <tr>
+        <td>Memory banner</td>
+        <td class="del">#f0f4f0 green tint</td>
+        <td class="add">#F7EDE0 surface-alt — neutral, not health-coded</td>
+      </tr>
+      <tr>
+        <td>Section label</td>
+        <td class="del">emoji + dark text</td>
+        <td class="add">SVG icon + #D9622B text, small-caps</td>
+      </tr>
+      <tr>
+        <td>Streak indicator</td>
+        <td class="del">🔥 emoji</td>
+        <td class="add">SVG flame, --primary color</td>
+      </tr>
+    </table>
+  </div>
+
+
+  <!-- ═══ SECTION 2: TYPOGRAPHY ═══ -->
+  <div class="section">
+    <div class="section-header">
+      <span class="section-num">02</span>
+      <span class="section-title">Typography — Giữ Nguyên Nhưng Tăng Hierarchy</span>
+    </div>
+
+    <div class="callout">
+      <div class="callout-label">Giữ Nguyên</div>
+      <p>Font stack giờ là Fraunces + Be Vietnam Pro — 2 font, gọn hơn, đủ dấu Việt hoàn toàn. Feeling "mono" cho labels tạo bằng <strong>Be Vietnam Pro + letter-spacing + text-transform uppercase</strong>, không cần font monospace riêng.</p>
+    </div>
+
+    <div style="border:1px solid var(--border);border-radius:var(--r-lg);overflow:hidden;margin-bottom:24px;">
+      <div class="type-row" style="padding:20px 24px;">
+        <div class="type-meta">display / 36px<br>Fraunces 600</div>
+        <div class="type-sample" style="font-family:var(--f-display);font-size:36px;font-weight:600;color:var(--text-1);">Canh Chua Cá Lóc</div>
+        <div class="type-usage">Tên món trên swipe card, screen hero title</div>
+      </div>
+      <div class="type-row" style="padding:16px 24px;">
+        <div class="type-meta">heading / 22px<br>Fraunces 600</div>
+        <div class="type-sample" style="font-family:var(--f-display);font-size:22px;font-weight:600;color:var(--text-1);">Bữa tối hôm nay</div>
+        <div class="type-usage">Section headers, meal summary</div>
+      </div>
+      <div class="type-row" style="padding:16px 24px;">
+        <div class="type-meta">subhead / 17px<br>Be Vietnam Pro 600</div>
+        <div class="type-sample" style="font-family:var(--f-body);font-size:17px;font-weight:600;color:var(--text-1);">4 người · ~35 phút · ~110k</div>
+        <div class="type-usage">Card title, subheading</div>
+      </div>
+      <div class="type-row" style="padding:16px 24px;">
+        <div class="type-meta">body / 15px<br>Be Vietnam Pro 400</div>
+        <div class="type-sample" style="font-family:var(--f-body);font-size:15px;color:var(--text-2);">Cân bằng bệnh lý và sở thích từng người trong gia đình.</div>
+        <div class="type-usage">Body text, descriptions</div>
+      </div>
+      <div class="type-row" style="padding:16px 24px;">
+        <div class="type-meta">label / 10px<br>Be Vietnam Pro 500 · tracked</div>
+        <div class="type-sample" style="font-family:var(--f-mono);font-size:10px;font-weight:500;letter-spacing:.14em;text-transform:uppercase;color:var(--primary);">NGUYÊN LIỆU · BỘ NHỚ GIA ĐÌNH · THÔNG BÁO</div>
+        <div class="type-usage">Section labels, Food Mood callout labels</div>
+      </div>
+      <div class="type-row" style="padding:16px 24px;border-bottom:none;">
+        <div class="type-meta">meta / 12px<br>Be Vietnam Pro 400</div>
+        <div class="type-sample" style="font-family:var(--f-body);font-size:12px;color:var(--text-2);">Thứ 6, 27/02 · Phù hợp Bà nội · ⚠ Nên ăn ít Ba</div>
+        <div class="type-usage">Tags, health indicators, timestamps</div>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ═══ SECTION 3: ICON SYSTEM ═══ -->
+  <div class="section">
+    <div class="section-header">
+      <span class="section-num">03</span>
+      <span class="section-title">Icon System — Thay Thế Toàn Bộ Emoji</span>
+    </div>
+
+    <div class="callout change">
+      <div class="callout-label">Breaking Change</div>
+      <p><strong>100% emoji bị loại bỏ.</strong> Thay bằng SVG icon 1.5px stroke, rounded linecap, <code>currentColor</code>. Kích thước: 16px (inline), 20px (tag/meta), 24px (nav/action). Màu sắc theo context: primary (#D9622B) cho action, text-2 (#6B5447) cho neutral, health (#5A8A6A) cho health states. Không bao giờ mix màu icon trong cùng 1 component.</p>
+    </div>
+
+    <div style="margin-bottom:16px;font-family:var(--f-mono);font-size:10px;color:var(--text-3);letter-spacing:.1em;text-transform:uppercase;">Core Icon Library — tất cả stroke, 1.5px, rounded</div>
+
+    <div class="icon-grid">
+
+      <div class="icon-item">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z"/><path d="M12 6v6l4 2"/>
+        </svg>
+        <span class="icon-name">time<br>Thời gian nấu</span>
+      </div>
+
+      <div class="icon-item">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+        </svg>
+        <span class="icon-name">people<br>Số người</span>
+      </div>
+
+      <div class="icon-item">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M3 3h18v18H3zM3 9h18M9 21V9"/>
+        </svg>
+        <span class="icon-name">budget<br>Ngân sách</span>
+      </div>
+
+      <div class="icon-item">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/>
+        </svg>
+        <span class="icon-name">check-circle<br>Phù hợp</span>
+      </div>
+
+      <div class="icon-item">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+        </svg>
+        <span class="icon-name">info-circle<br>Lưu ý</span>
+      </div>
+
+      <div class="icon-item">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/>
+        </svg>
+        <span class="icon-name">x-circle<br>Không phù hợp</span>
+      </div>
+
+      <div class="icon-item">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M3.34 17a10 10 0 1 1 17.32 0"/><path d="M12 2v2"/><path d="m4.22 4.22 1.42 1.42"/><path d="M20 12h2"/><path d="m17.36 5.64 1.42-1.42"/>
+        </svg>
+        <span class="icon-name">meal-morning<br>Bữa sáng</span>
+      </div>
+
+      <div class="icon-item">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="5"/><path d="M12 2v2M12 20v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M2 12h2M20 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>
+        </svg>
+        <span class="icon-name">meal-noon<br>Bữa trưa</span>
+      </div>
+
+      <div class="icon-item">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+        </svg>
+        <span class="icon-name">meal-evening<br>Bữa tối</span>
+      </div>
+
+      <div class="icon-item">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+        </svg>
+        <span class="icon-name">heart<br>Yêu thích</span>
+      </div>
+
+      <div class="icon-item">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M9 18.5C9 19.9 10.1 21 11.5 21h1C13.9 21 15 19.9 15 18.5V17H9v1.5z"/><path d="M12 3c-3.87 0-7 3.13-7 7 0 1.74.64 3.33 1.69 4.55.34.39.56.83.67 1.29.02.1.03.2.04.16H17.6c.01.04.02-.06.04-.16.11-.46.33-.9.67-1.29C19.36 13.33 20 11.74 20 10c0-3.87-3.13-7-8-7z"/>
+        </svg>
+        <span class="icon-name">ai-brain<br>Memory engine</span>
+      </div>
+
+      <div class="icon-item">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M8.56 2.9A7 7 0 0 1 19 9v1c0 2-.35 3.8-1 5.4"/><path d="M4.56 7.5A7 7 0 0 0 5 9v1c0 3.87 2.24 7 8 7s8-3.13 8-7V9"/><line x1="2" y1="2" x2="22" y2="22"/>
+        </svg>
+        <span class="icon-name">ngay-cham-soc<br>Ngày chăm sóc</span>
+      </div>
+
+      <div class="icon-item">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M18 8h1a4 4 0 0 1 0 8h-1"/><path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"/><line x1="6" y1="1" x2="6" y2="4"/><line x1="10" y1="1" x2="10" y2="4"/><line x1="14" y1="1" x2="14" y2="4"/>
+        </svg>
+        <span class="icon-name">cook<br>Bắt đầu nấu</span>
+      </div>
+
+      <div class="icon-item">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/>
+        </svg>
+        <span class="icon-name">delivery<br>Gọi món</span>
+      </div>
+
+      <div class="icon-item">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/>
+        </svg>
+        <span class="icon-name">share<br>Chia sẻ</span>
+      </div>
+
+      <div class="icon-item">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/><path d="M4.93 4.93a10 10 0 0 0 0 14.14"/>
+        </svg>
+        <span class="icon-name">notification<br>Thông báo</span>
+      </div>
+
+      <div class="icon-item">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/>
+        </svg>
+        <span class="icon-name">history<br>Lịch sử</span>
+      </div>
+
+      <div class="icon-item">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/>
+        </svg>
+        <span class="icon-name">family<br>Gia đình</span>
+      </div>
+
+      <div class="icon-item">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="3"/><path d="M19.07 4.93l-1.41 1.41M6.34 17.66l-1.41 1.41M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M12 2v2M12 20v2"/>
+        </svg>
+        <span class="icon-name">settings<br>Cài đặt</span>
+      </div>
+
+      <div class="icon-item">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M19 12H5"/><polyline points="12 19 5 12 12 5"/>
+        </svg>
+        <span class="icon-name">arrow-left<br>Quay lại</span>
+      </div>
+
+      <!-- On dark demo -->
+      <div class="icon-item on-dark">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/>
+        </svg>
+        <span class="icon-name" style="color:rgba(255,255,255,0.6);">on-primary<br>FAB button</span>
+      </div>
+
+    </div>
+
+    <div class="callout">
+      <div class="callout-label">Icon Usage Rules</div>
+      <p><strong>1 màu / 1 context:</strong> Action icons = <code>var(--primary)</code>. Health icons = <code>var(--health)</code>. Neutral/nav icons = <code>var(--text-2)</code>. Không bao giờ mix trong cùng 1 component. Stroke luôn 1.5px. Dùng <code>stroke-linecap="round" stroke-linejoin="round"</code>. Không dùng icon fill (solid) ngoại trừ FAB share button (circle fill primary, icon white).</p>
+    </div>
+  </div>
+
+
+  <!-- ═══ SECTION 4: FLATNESS ═══ -->
+  <div class="section">
+    <div class="section-header">
+      <span class="section-num">04</span>
+      <span class="section-title">Flatness — Border Hierarchy, No Shadow</span>
+    </div>
+
+    <div class="callout change">
+      <div class="callout-label">Quy Tắc Mới</div>
+      <p><strong>Shadow bị cấm hoàn toàn</strong> trong component thường. Depth được tạo bằng border color hierarchy và background color variation — giống Food Mood. Shadow chỉ xuất hiện ở <code>--shadow-overlay</code> (bottom sheet, modal) và KHÔNG GÌ KHÁC.</p>
+    </div>
+
+    <div style="margin-bottom:16px;font-family:var(--f-mono);font-size:10px;color:var(--text-3);letter-spacing:.1em;text-transform:uppercase;">Depth Hierarchy — Border Only</div>
+
+    <div style="display:flex;flex-direction:column;gap:12px;margin-bottom:32px;">
+      <div style="background:var(--bg);border:1px solid var(--border);border-radius:var(--r-lg);padding:16px 20px;">
+        <div style="font-family:var(--f-mono);font-size:10px;color:var(--text-3);letter-spacing:.1em;text-transform:uppercase;margin-bottom:4px;">Level 0 — App background</div>
+        <div style="font-size:13px;color:var(--text-2);">bg: <code style="font-family:var(--f-mono);font-size:11px;">#FEF8F1</code> · No border · No shadow</div>
+      </div>
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);padding:16px 20px;">
+        <div style="font-family:var(--f-mono);font-size:10px;color:var(--text-3);letter-spacing:.1em;text-transform:uppercase;margin-bottom:4px;">Level 1 — Card / panel</div>
+        <div style="font-size:13px;color:var(--text-2);">surface <code style="font-family:var(--f-mono);font-size:11px;">#FFFDF9</code> · border <code style="font-family:var(--f-mono);font-size:11px;">1px #EAD8C8</code></div>
+      </div>
+      <div style="background:var(--surface-alt);border:1px solid var(--border-strong);border-radius:var(--r-lg);padding:16px 20px;">
+        <div style="font-family:var(--f-mono);font-size:10px;color:var(--text-3);letter-spacing:.1em;text-transform:uppercase;margin-bottom:4px;">Level 2 — Input / muted area</div>
+        <div style="font-size:13px;color:var(--text-2);">surface-alt <code style="font-family:var(--f-mono);font-size:11px;">#F7EDE0</code> · border <code style="font-family:var(--f-mono);font-size:11px;">1px #D4B8A5</code></div>
+      </div>
+      <div style="background:var(--primary-light);border:1px solid var(--primary-border);border-radius:var(--r-lg);padding:16px 20px;">
+        <div style="font-family:var(--f-mono);font-size:10px;color:var(--primary);letter-spacing:.1em;text-transform:uppercase;margin-bottom:4px;">Level 3 — Active / selected</div>
+        <div style="font-size:13px;color:var(--text-2);">primary-light <code style="font-family:var(--f-mono);font-size:11px;">#FAEAE0</code> · border <code style="font-family:var(--f-mono);font-size:11px;">1px #F0CBBA</code></div>
+      </div>
+    </div>
+
+    <table class="diff-table">
+      <tr>
+        <th>Component</th>
+        <th>V1 Shadow</th>
+        <th>V2 Replacement</th>
+      </tr>
+      <tr>
+        <td>Swipe card</td>
+        <td class="del">box-shadow: 0 8px 32px rgba(30,20,16,0.12)</td>
+        <td class="add">border: 1px solid var(--border-strong) only</td>
+      </tr>
+      <tr>
+        <td>CTA button</td>
+        <td class="del">shadow: 0 4px 16px rgba(232,103,58,0.35)</td>
+        <td class="add">No shadow. Border: 2px solid primary.</td>
+      </tr>
+      <tr>
+        <td>Pill tag</td>
+        <td class="del">No shadow (ok)</td>
+        <td class="add">Giữ nguyên — border based ✓</td>
+      </tr>
+      <tr>
+        <td>Bottom sheet</td>
+        <td class="del">No spec</td>
+        <td class="add">Shadow ONLY here: 0 -4px 32px rgba(30,20,16,0.10)</td>
+      </tr>
+      <tr>
+        <td>Memory banner</td>
+        <td class="del">background:#f0f4f0, border:#c8dfc8 (green)</td>
+        <td class="add">background: surface-alt, border: border · neutral tone</td>
+      </tr>
+    </table>
+  </div>
+
+
+  <!-- ═══ SECTION 5: CALLOUT COMPONENTS ═══ -->
+  <div class="section">
+    <div class="section-header">
+      <span class="section-num">05</span>
+      <span class="section-title">Callout Components — Food Mood Pattern</span>
+    </div>
+
+    <p style="font-size:14px;color:var(--text-2);margin-bottom:24px;">Food Mood dùng "floating label" callout box — label nhô ra trên top edge của card. Đây là signature pattern cần áp dụng vào: Pro Tips → Memory banners, Health context, Section callouts.</p>
+
+    <div style="margin-bottom:16px;font-family:var(--f-mono);font-size:10px;color:var(--text-3);letter-spacing:.1em;text-transform:uppercase;">Live Examples</div>
+
+    <div class="fm-callout" style="background:var(--surface);">
+      <div class="fm-label">BỘ NHỚ GIA ĐÌNH</div>
+      <div style="display:flex;align-items:center;gap:10px;">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="color:var(--primary);flex-shrink:0;">
+          <path d="M9 18.5C9 19.9 10.1 21 11.5 21h1C13.9 21 15 19.9 15 18.5V17H9v1.5z"/><path d="M12 3c-3.87 0-7 3.13-7 7 0 1.74.64 3.33 1.69 4.55.34.39.56.83.67 1.29.02.1.03.2.04.16H17.6c.01.04.02-.06.04-.16.11-.46.33-.9.67-1.29C19.36 13.33 20 11.74 20 10c0-3.87-3.13-7-8-7z"/>
+        </svg>
+        <p>Dựa trên <strong>14 bữa</strong> của gia đình bạn · Đang tìm hiểu thêm về sở thích</p>
+      </div>
+    </div>
+
+    <div class="fm-callout" style="background:var(--health-light);border-color:var(--health-border);">
+      <div class="fm-label" style="color:var(--health);border-color:var(--health-border);background:var(--health-light);">PHỤC HỢP SỨC KHOẺ</div>
+      <div style="display:flex;gap:12px;flex-wrap:wrap;">
+        <div style="display:flex;align-items:center;gap:5px;font-size:13px;color:var(--health);">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/>
+          </svg>
+          Phù hợp Ba (Gout)
+        </div>
+        <div style="display:flex;align-items:center;gap:5px;font-size:13px;color:var(--health);">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/>
+          </svg>
+          Phù hợp Mẹ (Huyết áp)
+        </div>
+        <div style="display:flex;align-items:center;gap:5px;font-size:13px;color:var(--warn);">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+          </svg>
+          Nên ăn ít Con nhỏ
+        </div>
+      </div>
+    </div>
+
+    <div class="fm-callout" style="background:var(--warn-light);border-color:var(--warn-border);">
+      <div class="fm-label" style="color:var(--warn);border-color:var(--warn-border);background:var(--warn-light);">LƯU Ý</div>
+      <p>Còn <strong>3 ngày</strong> dùng thử. Nâng cấp để tiếp tục sử dụng và giữ toàn bộ lịch sử gia đình.</p>
+    </div>
+
+    <div class="fm-callout" style="background:var(--surface-alt);">
+      <div class="fm-label">ĐÃ GHI NHỚ</div>
+      <p>4 món bữa hôm nay sẽ không gợi ý lại trong <strong>5 ngày</strong>. Bữa 15 giúp gợi ý chính xác hơn.</p>
+    </div>
+  </div>
+
+
+  <!-- ═══ SECTION 6: COMPONENT LIBRARY ═══ -->
+  <div class="section">
+    <div class="section-header">
+      <span class="section-num">06</span>
+      <span class="section-title">Component Library — Updated</span>
+    </div>
+
+    <!-- BUTTONS -->
+    <div class="component-section">
+      <div class="component-label">Buttons</div>
+      <div style="display:flex;gap:12px;flex-wrap:wrap;align-items:center;margin-bottom:16px;">
+        <button class="btn btn-primary">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M18 8h1a4 4 0 0 1 0 8h-1"/><path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"/><line x1="6" y1="1" x2="6" y2="4"/><line x1="10" y1="1" x2="10" y2="4"/><line x1="14" y1="1" x2="14" y2="4"/>
+          </svg>
+          Bắt đầu nấu
+        </button>
+        <button class="btn btn-outline">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/>
+          </svg>
+          Gọi món này
+        </button>
+        <button class="btn btn-ghost">Bỏ qua</button>
+        <button class="btn btn-primary btn-sm">Nâng cấp →</button>
+        <button class="btn btn-outline btn-sm">Xem lại</button>
+      </div>
+
+      <table class="diff-table">
+        <tr><th>State</th><th>V1</th><th>V2</th></tr>
+        <tr><td>Primary</td><td class="del">background:#1a1a1a</td><td class="add">background: var(--primary) #D9622B</td></tr>
+        <tr><td>Outline</td><td class="del">border:#1a1a1a, color:#1a1a1a</td><td class="add">border:2px var(--primary), color:var(--primary)</td></tr>
+        <tr><td>Icon</td><td class="del">Emoji prefix</td><td class="add">SVG 16px, currentColor, stroke-width:1.5</td></tr>
+      </table>
+    </div>
+
+    <!-- TAGS -->
+    <div class="component-section">
+      <div class="component-label">Pill Tags</div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:24px;">
+        <span class="tag tag-default">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/>
+          </svg>
+          25 phút
+        </span>
+        <span class="tag tag-default">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 3h18v18H3zM3 9h18M9 21V9"/>
+          </svg>
+          60k
+        </span>
+        <span class="tag tag-health">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/>
+          </svg>
+          Phù hợp Ba
+        </span>
+        <span class="tag tag-warn">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+          </svg>
+          Nên ăn ít Mẹ
+        </span>
+        <span class="tag tag-primary">Gout OK</span>
+        <span class="tag tag-default">Dưới 20p</span>
+        <span class="tag tag-default">80-150k</span>
+      </div>
+    </div>
+
+    <!-- SWIPE CARD DEMO -->
+    <div class="component-section">
+      <div class="component-label">Swipe Card — Updated</div>
+      <div class="phone-showcase">
+        <div>
+          <div class="card-demo">
+            <div class="card-demo-img">
+              <div class="card-demo-dish">Canh Chua Cá Lóc</div>
+            </div>
+            <div class="card-demo-body">
+              <div style="display:flex;gap:6px;margin-bottom:8px;flex-wrap:wrap;">
+                <span class="tag tag-default" style="height:26px;font-size:11px;">
+                  <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/>
+                  </svg>
+                  25p
+                </span>
+                <span class="tag tag-default" style="height:26px;font-size:11px;">60k</span>
+                <span class="tag tag-health" style="height:26px;font-size:11px;">
+                  <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/>
+                  </svg>
+                  Ba (Gout OK)
+                </span>
+              </div>
+              <div style="display:flex;justify-content:center;gap:16px;padding-top:8px;border-top:1px solid var(--border);">
+                <div style="display:flex;flex-direction:column;align-items:center;gap:4px;">
+                  <div style="width:40px;height:40px;border:1.5px solid var(--border-strong);border-radius:50%;display:flex;align-items:center;justify-content:center;color:var(--text-2);">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                      <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+                    </svg>
+                  </div>
+                  <span style="font-size:10px;color:var(--text-3);">Bỏ qua</span>
+                </div>
+                <div style="display:flex;flex-direction:column;align-items:center;gap:4px;">
+                  <div style="width:40px;height:40px;border:1.5px solid var(--primary);border-radius:50%;display:flex;align-items:center;justify-content:center;color:var(--primary);background:var(--primary-light);">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                      <polyline points="20 6 9 17 4 12"/>
+                    </svg>
+                  </div>
+                  <span style="font-size:10px;color:var(--primary);font-weight:600;">Chọn!</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div style="flex:1;min-width:240px;">
+          <div style="font-family:var(--f-mono);font-size:10px;color:var(--text-3);letter-spacing:.1em;text-transform:uppercase;margin-bottom:12px;">Swipe action states</div>
+          <div style="border:1px solid var(--border);border-radius:var(--r-md);overflow:hidden;">
+            <div style="padding:10px 14px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--border);">
+              <span style="font-size:12px;color:var(--text-2);">Default</span>
+              <span style="font-family:var(--f-mono);font-size:11px;color:var(--text-3);">border: 1px var(--border-strong)</span>
+            </div>
+            <div style="padding:10px 14px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--border);background:rgba(90,138,106,0.06);">
+              <span style="font-size:12px;color:var(--health);">Drag right → Chọn</span>
+              <span style="font-family:var(--f-mono);font-size:11px;color:var(--text-3);">rotate +5deg, green tint</span>
+            </div>
+            <div style="padding:10px 14px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--border);background:rgba(217,98,43,0.06);">
+              <span style="font-size:12px;color:var(--primary);">Drag left → Bỏ</span>
+              <span style="font-family:var(--f-mono);font-size:11px;color:var(--text-3);">rotate -5deg, primary tint</span>
+            </div>
+            <div style="padding:10px 14px;font-size:12px;color:var(--text-2);">
+              <strong>Không có shadow</strong> ở bất kỳ state nào. Card elevation chỉ từ border + background contrast với --bg canvas.
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ═══ SECTION 7: WIREFRAME MIGRATION ═══ -->
+  <div class="section">
+    <div class="section-header">
+      <span class="section-num">07</span>
+      <span class="section-title">Wireframe Migration Checklist</span>
+    </div>
+
+    <div class="callout warn">
+      <div class="callout-label">Action Required</div>
+      <p>Wireframes-pwa.html cần pass qua migration script để replace emoji + update màu. Checklist dưới đây là spec cho dev/designer thực hiện.</p>
+    </div>
+
+    <table class="diff-table">
+      <tr>
+        <th>Emoji cũ</th>
+        <th>Replace bằng</th>
+        <th>Context</th>
+      </tr>
+      <tr>
+        <td style="font-size:18px;">🌙</td>
+        <td class="add">SVG moon icon · 16px · color: currentColor</td>
+        <td>Bữa tối tab</td>
+      </tr>
+      <tr>
+        <td style="font-size:18px;">🌤</td>
+        <td class="add">SVG sun-with-cloud icon · 16px</td>
+        <td>Bữa trưa tab</td>
+      </tr>
+      <tr>
+        <td style="font-size:18px;">☀️</td>
+        <td class="add">SVG sun icon · 16px</td>
+        <td>Bữa sáng tab</td>
+      </tr>
+      <tr>
+        <td style="font-size:18px;">🍖 🥩</td>
+        <td class="add">SVG meat/protein icon · 14px · color: #C43A2A</td>
+        <td>Slot label — Mặn</td>
+      </tr>
+      <tr>
+        <td style="font-size:18px;">🍜</td>
+        <td class="add">SVG bowl/soup icon · 14px · color: #2a5ac4→var(--primary)</td>
+        <td>Slot label — Canh</td>
+      </tr>
+      <tr>
+        <td style="font-size:18px;">🥦</td>
+        <td class="add">SVG leaf icon · 14px · color: var(--health)</td>
+        <td>Slot label — Rau</td>
+      </tr>
+      <tr>
+        <td style="font-size:18px;">🍚</td>
+        <td class="add">SVG rice/bowl icon · 14px · color: var(--text-3)</td>
+        <td>Cơm auto slot</td>
+      </tr>
+      <tr>
+        <td style="font-size:18px;">🧠</td>
+        <td class="add">SVG brain/bulb icon · 14px · var(--primary)</td>
+        <td>Memory engine banners</td>
+      </tr>
+      <tr>
+        <td style="font-size:18px;">🔥</td>
+        <td class="add">SVG flame/streak icon · 14px · var(--primary)</td>
+        <td>Bộ đếm ngày chăm sóc S-05</td>
+      </tr>
+      <tr>
+        <td style="font-size:18px;">🎉</td>
+        <td class="add">Remove — text only "Bắt đầu chuỗi nấu cho gia đình!"</td>
+        <td>S-09 completion</td>
+      </tr>
+      <tr>
+        <td style="font-size:18px;">⏰</td>
+        <td class="add">SVG clock icon · 18px · var(--primary)</td>
+        <td>S-09n notification sheet</td>
+      </tr>
+      <tr>
+        <td style="font-size:18px;">↗</td>
+        <td class="add">SVG share icon · 14px</td>
+        <td>S-09 share button</td>
+      </tr>
+      <tr>
+        <td style="font-size:18px;">🍲</td>
+        <td class="add">SVG bowl icon · 32px · var(--border)</td>
+        <td>S-05e empty state illustration</td>
+      </tr>
+      <tr>
+        <td style="font-size:18px;">⭐⭐⭐⭐⭐</td>
+        <td class="add">5× SVG star path · 10px · var(--gold)</td>
+        <td>S-12c social proof</td>
+      </tr>
+      <tr>
+        <td style="font-size:18px;">🔒</td>
+        <td class="add">SVG lock icon · 24px · var(--text-3)</td>
+        <td>S-12c paywall header</td>
+      </tr>
+      <tr>
+        <td>CTA button #1a1a1a</td>
+        <td class="add">background: var(--primary) #D9622B</td>
+        <td>Toàn bộ primary buttons</td>
+      </tr>
+    </table>
+
+    <div class="callout" style="margin-top:24px;">
+      <div class="callout-label">Typography Migration</div>
+      <p>Thêm Google Fonts import vào wireframes: <code style="font-family:var(--f-mono);font-size:12px;">Fraunces + Be Vietnam Pro</code>. Đổi tất cả <code style="font-family:var(--f-mono);font-size:12px;">font-family:'Inter'</code> → <code style="font-family:var(--f-mono);font-size:12px;">var(--f-body)</code>. Dish names trong swipe cards → <code style="font-family:var(--f-mono);font-size:12px;">var(--f-display)</code>. Screen/section labels (S-01, S-02...) → <code style="font-family:var(--f-mono);font-size:12px;">var(--f-mono)</code>.</p>
+    </div>
+  </div>
+
+
+  <!-- ═══ SECTION 8: CSS TOKENS ═══ -->
+  <div class="section">
+    <div class="section-header">
+      <span class="section-num">08</span>
+      <span class="section-title">CSS Design Tokens v2.0 — Full Reference</span>
+    </div>
+
+    <div style="background:var(--text-1);border-radius:var(--r-lg);padding:24px 28px;overflow-x:auto;">
+      <pre style="font-family:var(--f-mono);font-size:12px;color:rgba(255,255,255,0.85);line-height:1.8;white-space:pre-wrap;">:root {
+  <span style="color:#F0CBBA;">/* ── COLORS ── */</span>
+  --color-bg:              #FEF8F1;   <span style="color:rgba(255,255,255,0.4);">/* Warm cream canvas */</span>
+  --color-surface:         #FFFDF9;   <span style="color:rgba(255,255,255,0.4);">/* Card/panel bg */</span>
+  --color-surface-alt:     #F7EDE0;   <span style="color:rgba(255,255,255,0.4);">/* Input, muted */</span>
+
+  --color-primary:         #D9622B;   <span style="color:rgba(255,255,255,0.4);">/* ALL actions — never #1a1a1a */</span>
+  --color-primary-hover:   #BF5024;
+  --color-primary-light:   #FAEAE0;
+  --color-primary-border:  #F0CBBA;
+
+  --color-health:          #5A8A6A;   <span style="color:rgba(255,255,255,0.4);">/* Health safe ONLY — not for actions */</span>
+  --color-health-light:    #E8F2EC;
+  --color-health-border:   #C0DACA;
+
+  --color-gold:            #C9933A;   <span style="color:rgba(255,255,255,0.4);">/* Premium badge ONLY */</span>
+  --color-warn:            #C97B2A;
+  --color-warn-light:      #FEF3E2;
+  --color-error:           #C04030;
+
+  --color-text-primary:    #1E1410;
+  --color-text-secondary:  #6B5447;
+  --color-text-disabled:   #B09A8C;
+  --color-border:          #EAD8C8;
+  --color-border-strong:   #D4B8A5;
+
+  <span style="color:#F0CBBA;">/* ── TYPOGRAPHY ── */</span>
+  --font-display: "Fraunces", Georgia, serif;
+  --font-body:    "Be Vietnam Pro", "Helvetica Neue", sans-serif;
+  --font-mono:    "Be Vietnam Pro", sans-serif; /* No mono needed — use letter-spacing */
+
+  <span style="color:#F0CBBA;">/* ── SPACING (4px base) ── */</span>
+  --space-1: 4px;   --space-2: 8px;   --space-3: 12px;
+  --space-4: 16px;  --space-5: 20px;  --space-6: 24px;
+  --space-8: 32px;  --space-10: 40px; --space-12: 48px;
+  --space-16: 64px;
+
+  <span style="color:#F0CBBA;">/* ── RADIUS ── */</span>
+  --radius-sm: 6px;  --radius-md: 12px;
+  --radius-lg: 16px; --radius-xl: 24px;
+  --radius-full: 9999px;
+
+  <span style="color:#F0CBBA;">/* ── ELEVATION — FLAT, BORDER ONLY ── */</span>
+  --shadow-overlay: 0 -4px 32px rgba(30, 20, 16, 0.10);
+  <span style="color:rgba(255,255,255,0.4);">/* NO other shadows. Use border + background for depth. */</span>
+
+  <span style="color:#F0CBBA;">/* ── ICONS — SVG only, no emoji ── */</span>
+  --icon-xs: 14px;  --icon-sm: 16px;
+  --icon-md: 20px;  --icon-lg: 24px;
+  --icon-xl: 32px;
+  <span style="color:rgba(255,255,255,0.4);">/* stroke: currentColor, stroke-width: 1.5, rounded caps */</span>
+
+  <span style="color:#F0CBBA;">/* ── ANIMATION ── */</span>
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1.0);
+  --ease-out:    cubic-bezier(0.0, 0.0, 0.2, 1.0);
+  --dur-fast: 150ms; --dur-default: 250ms; --dur-medium: 350ms;
+}</pre>
+    </div>
+  </div>
+
+
+  <!-- ═══ SECTION 09: FORM & INPUT COMPONENTS ═══ -->
+  <div class="section">
+    <div class="section-header">
+      <span class="section-num">09</span>
+      <span class="section-title">Form & Input Components</span>
+    </div>
+
+    <div class="callout">
+      <div class="callout-label">Nguyên tắc</div>
+      <p>Tất cả input đều dùng <strong>surface-alt (#F7EDE0)</strong> làm background — warm, không harsh. Focus state dùng <strong>border-accent (#D9622B)</strong> 2px. Error state dùng <strong>var(--error)</strong>. Không dùng shadow trên input — depth từ border + background như mọi component khác.</p>
+    </div>
+
+    <!-- TEXT FIELD -->
+    <div class="component-section">
+      <div class="component-label">Text Field — States</div>
+      <div style="display:flex;flex-direction:column;gap:12px;max-width:360px;margin-bottom:24px;">
+
+        <div style="display:flex;flex-direction:column;gap:6px;">
+          <label style="font-family:var(--f-body);font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--text-3);">Nhãn</label>
+          <div style="background:var(--surface-alt);border:1px solid var(--border);border-radius:var(--r-md);padding:12px 14px;font-size:15px;color:var(--text-2);">Placeholder text</div>
+          <span style="font-family:var(--f-mono);font-size:10px;color:var(--text-3);">Default — border: 1px var(--border)</span>
+        </div>
+
+        <div style="display:flex;flex-direction:column;gap:6px;">
+          <label style="font-family:var(--f-body);font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--text-2);">Nhãn</label>
+          <div style="background:var(--surface-alt);border:2px solid var(--primary);border-radius:var(--r-md);padding:12px 14px;font-size:15px;color:var(--text-1);">Nội dung đang nhập</div>
+          <span style="font-family:var(--f-mono);font-size:10px;color:var(--text-3);">Focus — border: 2px var(--primary) · label lên text-2</span>
+        </div>
+
+        <div style="display:flex;flex-direction:column;gap:6px;">
+          <label style="font-family:var(--f-body);font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--text-1);">Nhãn</label>
+          <div style="background:var(--surface-alt);border:1px solid var(--border-strong);border-radius:var(--r-md);padding:12px 14px;font-size:15px;color:var(--text-1);">Nội dung đã nhập</div>
+          <span style="font-family:var(--f-mono);font-size:10px;color:var(--text-3);">Filled — border: 1px var(--border-strong) · label text-1</span>
+        </div>
+
+        <div style="display:flex;flex-direction:column;gap:6px;">
+          <label style="font-family:var(--f-body);font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--error);">Nhãn</label>
+          <div style="background:var(--error-light);border:2px solid var(--error);border-radius:var(--r-md);padding:12px 14px;font-size:15px;color:var(--text-1);">Giá trị lỗi</div>
+          <span style="font-size:12px;color:var(--error);">Thông báo lỗi cụ thể — không dùng "lỗi", dùng hướng dẫn sửa</span>
+        </div>
+
+        <div style="display:flex;flex-direction:column;gap:6px;">
+          <label style="font-family:var(--f-body);font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--text-3);">Nhãn</label>
+          <div style="background:var(--surface-alt);border:1px solid var(--border);border-radius:var(--r-md);padding:12px 14px;font-size:15px;color:var(--text-3);opacity:.6;">Không thể chỉnh sửa</div>
+          <span style="font-family:var(--f-mono);font-size:10px;color:var(--text-3);">Disabled — opacity: 0.6 · pointer-events: none</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- TOGGLE -->
+    <div class="component-section">
+      <div class="component-label">Toggle</div>
+      <div style="display:flex;gap:32px;flex-wrap:wrap;margin-bottom:24px;">
+        <div style="display:flex;flex-direction:column;gap:8px;align-items:center;">
+          <div style="width:44px;height:24px;background:var(--border-strong);border-radius:var(--r-full);position:relative;">
+            <div style="width:20px;height:20px;background:white;border-radius:50%;position:absolute;top:2px;left:2px;box-shadow:0 1px 3px rgba(30,20,16,.15);"></div>
+          </div>
+          <span style="font-family:var(--f-mono);font-size:10px;color:var(--text-3);">Off</span>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:8px;align-items:center;">
+          <div style="width:44px;height:24px;background:var(--primary);border-radius:var(--r-full);position:relative;">
+            <div style="width:20px;height:20px;background:white;border-radius:50%;position:absolute;top:2px;right:2px;box-shadow:0 1px 3px rgba(30,20,16,.15);"></div>
+          </div>
+          <span style="font-family:var(--f-mono);font-size:10px;color:var(--primary);">On</span>
+        </div>
+      </div>
+      <table class="diff-table" style="max-width:480px;">
+        <tr><th>State</th><th>Track</th><th>Thumb</th></tr>
+        <tr><td>Off</td><td class="add">var(--border-strong) #D4B8A5</td><td class="add">white · 20×20px · border-radius full</td></tr>
+        <tr><td>On</td><td class="add">var(--primary) #D9622B</td><td class="add">white · translate 20px right</td></tr>
+        <tr><td>Disabled</td><td class="add">var(--border) · opacity .5</td><td class="add">pointer-events: none</td></tr>
+      </table>
+    </div>
+
+    <!-- STEPPER -->
+    <div class="component-section">
+      <div class="component-label">Stepper — Số người (Onboarding)</div>
+      <div style="display:inline-flex;align-items:center;gap:0;border:1px solid var(--border-strong);border-radius:var(--r-md);overflow:hidden;margin-bottom:16px;">
+        <button style="width:44px;height:44px;background:var(--surface-alt);border:none;font-size:20px;color:var(--text-2);cursor:pointer;display:flex;align-items:center;justify-content:center;">−</button>
+        <div style="padding:0 24px;height:44px;display:flex;align-items:center;font-size:18px;font-weight:600;color:var(--text-1);border-left:1px solid var(--border);border-right:1px solid var(--border);min-width:56px;justify-content:center;">4</div>
+        <button style="width:44px;height:44px;background:var(--surface-alt);border:none;font-size:20px;color:var(--primary);cursor:pointer;display:flex;align-items:center;justify-content:center;">+</button>
+      </div>
+      <div style="font-family:var(--f-mono);font-size:10px;color:var(--text-3);">Min: 1 · Max: 8 · Decrement ở min = disabled (opacity .5) · Không dùng text input</div>
+    </div>
+
+    <!-- TIME PICKER (Reminder) -->
+    <div class="component-section">
+      <div class="component-label">Time Picker — Nhắc nhở (Cài đặt)</div>
+      <div style="display:flex;gap:8px;align-items:center;margin-bottom:16px;">
+        <div style="background:var(--surface-alt);border:2px solid var(--primary);border-radius:var(--r-md);padding:10px 16px;font-size:22px;font-weight:600;font-family:var(--f-display);color:var(--text-1);min-width:64px;text-align:center;">17</div>
+        <span style="font-size:24px;color:var(--text-2);font-weight:600;">:</span>
+        <div style="background:var(--surface-alt);border:1px solid var(--border);border-radius:var(--r-md);padding:10px 16px;font-size:22px;font-weight:600;font-family:var(--f-display);color:var(--text-1);min-width:64px;text-align:center;">30</div>
+      </div>
+      <div style="font-family:var(--f-mono);font-size:10px;color:var(--text-3);">Native iOS/Android time picker — không custom. Wrapper chỉ style trigger button. Active segment: border primary 2px.</div>
+    </div>
+
+    <!-- CHIP SELECT (Bệnh lý) -->
+    <div class="component-section">
+      <div class="component-label">Chip Select — Bệnh lý (Onboarding)</div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px;">
+        <div style="padding:8px 14px;border:2px solid var(--primary);border-radius:var(--r-full);background:var(--primary-light);color:var(--primary);font-size:13px;font-weight:600;">✓ Gout</div>
+        <div style="padding:8px 14px;border:2px solid var(--primary);border-radius:var(--r-full);background:var(--primary-light);color:var(--primary);font-size:13px;font-weight:600;">✓ Huyết áp</div>
+        <div style="padding:8px 14px;border:1px solid var(--border);border-radius:var(--r-full);background:var(--surface);color:var(--text-2);font-size:13px;">Tiểu đường</div>
+        <div style="padding:8px 14px;border:1px solid var(--border);border-radius:var(--r-full);background:var(--surface);color:var(--text-2);font-size:13px;">Dạ dày</div>
+        <div style="padding:8px 14px;border:1px solid var(--border);border-radius:var(--r-full);background:var(--surface);color:var(--text-2);font-size:13px;">Trẻ em</div>
+      </div>
+      <div style="font-family:var(--f-mono);font-size:10px;color:var(--text-3);">Multi-select · Selected: border primary 2px + primary-light bg · Unselected: border 1px default · Không dùng checkbox</div>
+    </div>
+  </div>
+
+
+  <!-- ═══ SECTION 10: NAVIGATION ═══ -->
+  <div class="section">
+    <div class="section-header">
+      <span class="section-num">10</span>
+      <span class="section-title">Navigation — Bottom Nav & Bottom Sheet</span>
+    </div>
+
+    <!-- BOTTOM NAV -->
+    <div class="component-section">
+      <div class="component-label">Bottom Navigation Bar</div>
+
+      <div style="max-width:375px;margin-bottom:24px;">
+        <div style="background:var(--surface);border-top:1px solid var(--border);display:grid;grid-template-columns:repeat(3,1fr);padding:8px 0 20px;">
+          <div style="display:flex;flex-direction:column;align-items:center;gap:4px;padding:8px 0;">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#D9622B" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+            <span style="font-size:10px;font-weight:600;color:var(--primary);">Hôm nay</span>
+            <div style="width:4px;height:4px;border-radius:50%;background:var(--primary);"></div>
+          </div>
+          <div style="display:flex;flex-direction:column;align-items:center;gap:4px;padding:8px 0;">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#B09A8C" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+            <span style="font-size:10px;color:var(--text-3);">Gia đình</span>
+          </div>
+          <div style="display:flex;flex-direction:column;align-items:center;gap:4px;padding:8px 0;">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#B09A8C" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M4.93 4.93a10 10 0 0 0 0 14.14"/></svg>
+            <span style="font-size:10px;color:var(--text-3);">Cài đặt</span>
+          </div>
+        </div>
+      </div>
+
+      <table class="diff-table" style="max-width:560px;">
+        <tr><th>Spec</th><th>Value</th><th>Note</th></tr>
+        <tr><td>Height</td><td class="add">56px content + safe-area-inset-bottom</td><td style="color:var(--text-2);font-size:12px;">Không hardcode — dùng padding-bottom: env(safe-area-inset-bottom)</td></tr>
+        <tr><td>Background</td><td class="add">var(--surface) #FFFDF9</td><td style="color:var(--text-2);font-size:12px;">Tách biệt với bg canvas bằng border-top</td></tr>
+        <tr><td>Active icon</td><td class="add">var(--primary) #D9622B · stroke 1.5</td><td style="color:var(--text-2);font-size:12px;">Active indicator: dot 4px bên dưới label</td></tr>
+        <tr><td>Inactive icon</td><td class="add">var(--text-3) #B09A8C · stroke 1.5</td><td style="color:var(--text-2);font-size:12px;">Label: 10px · font-body · không uppercase</td></tr>
+        <tr><td>Active label</td><td class="add">var(--primary) · weight 600</td><td style="color:var(--text-2);font-size:12px;">Label luôn visible — không ẩn khi inactive</td></tr>
+        <tr><td>Tap area</td><td class="add">Min 44×44px per tab</td><td style="color:var(--text-2);font-size:12px;">iOS HIG minimum touch target</td></tr>
+      </table>
+    </div>
+
+    <!-- BOTTOM SHEET -->
+    <div class="component-section">
+      <div class="component-label">Bottom Sheet — Chế Độ Tủ Lạnh</div>
+
+      <div style="max-width:375px;margin-bottom:24px;border:1px solid var(--border);border-radius:var(--r-lg);overflow:hidden;">
+        <div style="height:80px;background:var(--surface-alt);display:flex;align-items:center;justify-content:center;color:var(--text-3);font-size:12px;">App content bên dưới — scrim overlay</div>
+        <div style="background:var(--surface);border-top:1px solid var(--border);border-radius:var(--r-xl) var(--r-xl) 0 0;padding:12px 20px 24px;box-shadow:0 -4px 32px rgba(30,20,16,.10);">
+          <div style="width:36px;height:4px;background:var(--border-strong);border-radius:var(--r-full);margin:0 auto 16px;"></div>
+          <div style="font-family:var(--f-display);font-size:17px;font-weight:600;color:var(--text-1);margin-bottom:4px;">Chế Độ Tủ Lạnh</div>
+          <div style="font-size:13px;color:var(--text-2);">Chọn nguyên liệu đang có...</div>
+        </div>
+      </div>
+
+      <table class="diff-table" style="max-width:560px;">
+        <tr><th>Spec</th><th>Value</th><th>Note</th></tr>
+        <tr><td>Handle bar</td><td class="add">36×4px · var(--border-strong) · radius full · margin auto</td><td style="color:var(--text-2);font-size:12px;">Không dùng icon kéo — chỉ pill shape</td></tr>
+        <tr><td>Corner radius</td><td class="add">var(--r-xl) 24px — top corners only</td><td style="color:var(--text-2);font-size:12px;">Bottom corners = 0 · sheet dính sát bottom</td></tr>
+        <tr><td>Shadow</td><td class="add">var(--shadow-overlay): 0 -4px 32px rgba(30,20,16,.10)</td><td style="color:var(--text-2);font-size:12px;"><strong>Ngoại lệ duy nhất</strong> của no-shadow rule</td></tr>
+        <tr><td>Scrim</td><td class="add">rgba(30,20,16,.40) · blur(0)</td><td style="color:var(--text-2);font-size:12px;">Không blur scrim — flat</td></tr>
+        <tr><td>Heights</td><td class="add">Compact: 40vh · Expanded: 80vh · Full: 100vh</td><td style="color:var(--text-2);font-size:12px;">Snap points · Drag vượt quá full → dismiss</td></tr>
+        <tr><td>Background</td><td class="add">var(--surface) #FFFDF9</td><td style="color:var(--text-2);font-size:12px;">Không dùng --bg · contrast với scrim</td></tr>
+        <tr><td>Dismiss</td><td class="add">Tap scrim · Drag down · Swipe velocity > 500px/s</td><td style="color:var(--text-2);font-size:12px;">Không dùng nút X — giữ screen clean</td></tr>
+      </table>
+    </div>
+  </div>
+
+
+  <!-- ═══ SECTION 11: LAYOUT GRID & SAFE AREAS ═══ -->
+  <div class="section">
+    <div class="section-header">
+      <span class="section-num">11</span>
+      <span class="section-title">Layout Grid & Safe Areas</span>
+    </div>
+
+    <div class="callout">
+      <div class="callout-label">Base device</div>
+      <p>Design tại <strong>375px width</strong> (iPhone SE / standard). Scale test tại 390px (iPhone 14) và 360px (Android mid-range). Không design cho tablet — PWA only trên mobile.</p>
+    </div>
+
+    <div style="margin-bottom:16px;font-family:var(--f-mono);font-size:10px;color:var(--text-3);letter-spacing:.1em;text-transform:uppercase;margin-top:24px;">Grid Spec</div>
+    <table class="diff-table" style="max-width:560px;margin-bottom:32px;">
+      <tr><th>Property</th><th>Value</th><th>Note</th></tr>
+      <tr><td>Columns</td><td class="add">4 columns · fluid</td><td style="color:var(--text-2);font-size:12px;">Hầu hết content full-width hoặc 2-col</td></tr>
+      <tr><td>Gutter ngang</td><td class="add">16px (--space-4) mỗi bên</td><td style="color:var(--text-2);font-size:12px;">Content max = 375 − 32 = 343px</td></tr>
+      <tr><td>Gutter dọc cơ sở</td><td class="add">16px giữa các section block</td><td style="color:var(--text-2);font-size:12px;">Card stack dùng 12px</td></tr>
+      <tr><td>Top safe area</td><td class="add">env(safe-area-inset-top) — min 44px</td><td style="color:var(--text-2);font-size:12px;">Status bar + notch · không hardcode</td></tr>
+      <tr><td>Bottom safe area</td><td class="add">56px nav + env(safe-area-inset-bottom)</td><td style="color:var(--text-2);font-size:12px;">Bottom nav height + home indicator</td></tr>
+      <tr><td>Swipe card width</td><td class="add">343px (full content width) · height: 520px</td><td style="color:var(--text-2);font-size:12px;">3:4 ratio ≈ 343×457 — đến 520px với info area bên dưới</td></tr>
+    </table>
+
+    <div style="margin-bottom:16px;font-family:var(--f-mono);font-size:10px;color:var(--text-3);letter-spacing:.1em;text-transform:uppercase;">Screen Zones — Visual</div>
+    <div style="max-width:280px;border:1px solid var(--border);border-radius:var(--r-lg);overflow:hidden;margin-bottom:24px;">
+      <div style="background:var(--text-1);padding:10px 16px;display:flex;justify-content:space-between;align-items:center;">
+        <span style="font-family:var(--f-mono);font-size:9px;color:rgba(255,255,255,.4);letter-spacing:.1em;">STATUS BAR</span>
+        <span style="font-family:var(--f-mono);font-size:9px;color:rgba(255,255,255,.4);">safe-area-inset-top</span>
+      </div>
+      <div style="background:var(--surface-warm);padding:12px 16px;border-bottom:1px solid var(--border);">
+        <span style="font-family:var(--f-mono);font-size:9px;color:var(--text-3);letter-spacing:.1em;">HEADER / SCREEN TITLE</span>
+      </div>
+      <div style="background:var(--bg);padding:24px 16px;min-height:120px;display:flex;align-items:center;justify-content:center;">
+        <span style="font-family:var(--f-mono);font-size:9px;color:var(--text-3);letter-spacing:.1em;text-align:center;">CONTENT AREA<br>16px gutter mỗi bên</span>
+      </div>
+      <div style="background:var(--surface);border-top:1px solid var(--border);padding:10px 16px 18px;">
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);text-align:center;">
+          <span style="font-family:var(--f-mono);font-size:8px;color:var(--primary);">● Hôm nay</span>
+          <span style="font-family:var(--f-mono);font-size:8px;color:var(--text-3);">Gia đình</span>
+          <span style="font-family:var(--f-mono);font-size:8px;color:var(--text-3);">Cài đặt</span>
+        </div>
+        <div style="text-align:center;margin-top:6px;"><span style="font-family:var(--f-mono);font-size:8px;color:var(--text-3);">+ safe-area-inset-bottom</span></div>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ═══ SECTION 12: STATES, SKELETON & TOAST ═══ -->
+  <div class="section">
+    <div class="section-header">
+      <span class="section-num">12</span>
+      <span class="section-title">States, Skeleton & Toast</span>
+    </div>
+
+    <!-- SKELETON -->
+    <div class="component-section">
+      <div class="component-label">Skeleton Loading — Swipe Card</div>
+      <div style="max-width:260px;background:var(--surface);border:1px solid var(--border-strong);border-radius:var(--r-xl);overflow:hidden;margin-bottom:16px;">
+        <div style="height:200px;background:linear-gradient(90deg,var(--surface-alt) 25%,var(--border) 50%,var(--surface-alt) 75%);background-size:200% 100%;animation:shimmer 1.5s infinite;border-radius:var(--r-xl) var(--r-xl) 0 0;"></div>
+        <div style="padding:14px 16px;display:flex;flex-direction:column;gap:8px;">
+          <div style="height:20px;width:70%;background:linear-gradient(90deg,var(--surface-alt) 25%,var(--border) 50%,var(--surface-alt) 75%);background-size:200% 100%;border-radius:var(--r-sm);animation:shimmer 1.5s infinite;"></div>
+          <div style="height:14px;width:50%;background:linear-gradient(90deg,var(--surface-alt) 25%,var(--border) 50%,var(--surface-alt) 75%);background-size:200% 100%;border-radius:var(--r-sm);animation:shimmer 1.5s infinite;"></div>
+          <div style="display:flex;gap:8px;margin-top:4px;">
+            <div style="height:24px;width:60px;background:linear-gradient(90deg,var(--surface-alt) 25%,var(--border) 50%,var(--surface-alt) 75%);background-size:200% 100%;border-radius:var(--r-full);animation:shimmer 1.5s infinite;"></div>
+            <div style="height:24px;width:80px;background:linear-gradient(90deg,var(--surface-alt) 25%,var(--border) 50%,var(--surface-alt) 75%);background-size:200% 100%;border-radius:var(--r-full);animation:shimmer 1.5s infinite;"></div>
+          </div>
+        </div>
+      </div>
+      <style>@keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}</style>
+      <table class="diff-table" style="max-width:480px;">
+        <tr><th>Spec</th><th>Value</th></tr>
+        <tr><td>Base color</td><td class="add">var(--surface-alt) #F7EDE0</td></tr>
+        <tr><td>Shimmer color</td><td class="add">var(--border) #EAD8C8</td></tr>
+        <tr><td>Animation</td><td class="add">shimmer 1.5s ease-in-out infinite · gradient sweep left→right</td></tr>
+        <tr><td>Duration show</td><td class="add">Show nếu load > 300ms · Hide ngay khi data có</td></tr>
+        <tr><td>Shape</td><td class="add">Match exact layout của component thật — không dùng generic bars</td></tr>
+      </table>
+    </div>
+
+    <!-- BUTTON STATES -->
+    <div class="component-section">
+      <div class="component-label">Button — Full State Set</div>
+      <div style="display:flex;gap:12px;flex-wrap:wrap;align-items:center;margin-bottom:16px;">
+        <button class="btn btn-primary">Mặc định</button>
+        <button class="btn btn-primary" style="opacity:.7;transform:scale(.97);">Pressed</button>
+        <button class="btn btn-primary" style="position:relative;overflow:hidden;">
+          <span style="opacity:0;">Loading</span>
+          <span style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83" style="animation:spin .8s linear infinite"/></svg>
+          </span>
+        </button>
+        <button class="btn btn-primary" style="opacity:.4;cursor:not-allowed;">Vô hiệu</button>
+      </div>
+      <style>@keyframes spin{to{transform:rotate(360deg)}}</style>
+      <table class="diff-table" style="max-width:480px;">
+        <tr><th>State</th><th>Visual</th></tr>
+        <tr><td>Default</td><td class="add">bg: var(--primary) · color: white · opacity: 1</td></tr>
+        <tr><td>Pressed</td><td class="add">bg: var(--primary-hover) #BF5024 · scale(0.97) · dur-fast 150ms</td></tr>
+        <tr><td>Loading</td><td class="add">Text ẩn · SVG spinner white · pointer-events: none</td></tr>
+        <tr><td>Disabled</td><td class="add">opacity: 0.4 · cursor: not-allowed · pointer-events: none</td></tr>
+      </table>
+    </div>
+
+    <!-- TOAST / MICRO-RECOGNITION -->
+    <div class="component-section">
+      <div class="component-label">Toast — Micro-recognition S-07</div>
+
+      <div style="max-width:343px;margin-bottom:20px;display:flex;flex-direction:column;gap:8px;">
+        <div style="background:var(--text-1);border-radius:var(--r-md);padding:14px 16px;">
+          <div style="font-size:13.5px;color:#FFFDF9;line-height:1.65;font-style:italic;">"Tối nay không ai phải ăn riêng. Cùng một bàn, cùng một bữa — điều đó không tự nhiên mà có đâu."</div>
+        </div>
+        <div style="background:var(--primary-light);border:1px solid var(--primary-border);border-radius:var(--r-md);padding:14px 16px;">
+          <div style="font-size:13.5px;color:var(--text-1);line-height:1.65;font-style:italic;">"Mười bữa rồi đó. Từ từ mà chắc — cái này mới là thứ thật. Cứ vậy đi nhé."</div>
+          <div style="margin-top:8px;font-family:var(--f-mono);font-size:10px;color:var(--primary);letter-spacing:.08em;">MỐC 10 BỮA</div>
+        </div>
+      </div>
+
+      <table class="diff-table" style="max-width:560px;">
+        <tr><th>Spec</th><th>Nhận dạng thường</th><th>Mốc hoàn thành</th></tr>
+        <tr><td>Background</td><td class="add">var(--text-1) #1E1410</td><td class="add">var(--primary-light) #FAEAE0</td></tr>
+        <tr><td>Text color</td><td class="add">#FFFDF9 (warm white)</td><td class="add">var(--text-1)</td></tr>
+        <tr><td>Border</td><td class="add">Không</td><td class="add">1px var(--primary-border) #F0CBBA</td></tr>
+        <tr><td>Position</td><td class="add" colspan="2">Bottom · margin 16px từ content · trên bottom nav · không overlap action</td></tr>
+        <tr><td>Width</td><td class="add" colspan="2">Content width: 343px (full gutter)</td></tr>
+        <tr><td>Font</td><td class="add" colspan="2">13.5px · font-body · italic · line-height 1.65</td></tr>
+        <tr><td>Không action</td><td class="add" colspan="2">Không có nút · Không yêu cầu interaction · Auto dismiss sau 4s</td></tr>
+        <tr><td>Animation in</td><td class="add" colspan="2">slide-up 250ms var(--ease-spring) · sau khi user đã chọn xong bữa ≥ 1s</td></tr>
+        <tr><td>Animation out</td><td class="add" colspan="2">fade 200ms var(--ease-out) · sau 4s hoặc khi user tap anywhere</td></tr>
+        <tr><td>Max per session</td><td class="add" colspan="2">1 toast per meal selection · không stack · không queue</td></tr>
+      </table>
+    </div>
+  </div>
+
+
+  <!-- ═══ SECTION 13: FOOD PHOTO INTEGRATION ═══ -->
+  <div class="section">
+    <div class="section-header">
+      <span class="section-num">13</span>
+      <span class="section-title">Food Photo Integration</span>
+    </div>
+
+    <div class="callout change">
+      <div class="callout-label">Source of Truth</div>
+      <p>Full spec trong <strong>food-photo-system-v1.1</strong>. Section này là bridge: những thứ designer cần biết khi làm hi-fi, không cần đọc toàn bộ food photo doc.</p>
+    </div>
+
+    <!-- ASPECT RATIOS -->
+    <div class="component-section">
+      <div class="component-label">Aspect Ratio — Theo Context</div>
+      <table class="diff-table" style="max-width:560px;margin-bottom:24px;">
+        <tr><th>Context</th><th>Tỷ lệ</th><th>Kích thước generate</th><th>Note</th></tr>
+        <tr><td>Swipe card (primary)</td><td class="add">3:4 portrait</td><td class="add">1024 × 1365px</td><td style="color:var(--text-2);font-size:12px;">object-fit: cover · crops sides</td></tr>
+        <tr><td>Recipe detail hero</td><td class="add">1:1 vuông</td><td class="add">1024 × 1024px</td><td style="color:var(--text-2);font-size:12px;">50/50 split layout · không re-generate từ card</td></tr>
+        <tr><td>Thumbnail / lịch sử</td><td class="add">1:1 vuông</td><td class="add">Downscale từ hero</td><td style="color:var(--text-2);font-size:12px;">256×256 · không generate riêng</td></tr>
+        <tr><td>Social / OG</td><td class="add">16:9</td><td class="add">1024 × 576px</td><td style="color:var(--text-2);font-size:12px;">Chỉ khi cần marketing</td></tr>
+      </table>
+    </div>
+
+    <!-- CSS CLASS -->
+    <div class="component-section">
+      <div class="component-label">CSS Post-Process — .food-photo (mandatory)</div>
+      <div style="background:var(--text-1);border-radius:var(--r-lg);padding:20px 24px;margin-bottom:16px;overflow-x:auto;">
+        <pre style="font-family:var(--f-mono);font-size:12px;color:rgba(255,255,255,0.85);line-height:1.8;white-space:pre-wrap;"><span style="color:#F0CBBA;">/* Bắt buộc trên mọi AI-gen food image */</span>
+.food-photo {
+  filter: blur(1px) brightness(1.02) contrast(1.04) saturate(1.03);
+  overflow: hidden;
+  border-radius: inherit;
+  transform: translateZ(0); <span style="color:rgba(255,255,255,.35);">/* GPU — chỉ dùng trên swipe card */</span>
+}
+.food-photo img { display:block; width:100%; height:100%; object-fit:cover; transform:scale(1.01); }
+
+<span style="color:#F0CBBA;">/* Variants */</span>
+.swipe-card .food-photo  { border-radius: var(--r-xl); will-change: filter, transform; }
+.recipe-hero .food-photo { filter: blur(1.5px) brightness(1.02) contrast(1.04) saturate(1.03); border-radius: 0; }
+.food-thumbnail .food-photo { filter: blur(0.5px) brightness(1.02) contrast(1.03) saturate(1.02); }</pre>
+      </div>
+      <div class="callout warn">
+        <div class="callout-label">Lưu ý</div>
+        <p><strong>will-change chỉ dùng trên swipe card</strong> — không dùng global. Trên history screen với 30+ thumbnails sẽ gây memory issue trên Android tầm trung. <strong>Không tăng blur quá 2px</strong> — re-generate ảnh nếu chưa đủ mềm.</p>
+      </div>
+    </div>
+
+    <!-- GRADIENT CLARIFICATION -->
+    <div class="component-section">
+      <div class="component-label">Gradient — Ngoại lệ của No-Gradient Rule</div>
+      <div style="max-width:260px;margin-bottom:16px;border-radius:var(--r-xl);overflow:hidden;border:1px solid var(--border-strong);">
+        <div style="height:160px;background:linear-gradient(to bottom,var(--surface-alt) 0%,var(--surface-alt) 40%,rgba(30,20,16,.7) 100%);display:flex;align-items:flex-end;padding:12px 14px;">
+          <span style="font-family:var(--f-display);font-size:17px;font-weight:600;color:#FFFDF9;">Canh Chua Cá Lóc</span>
+        </div>
+      </div>
+      <table class="diff-table" style="max-width:480px;">
+        <tr><th>Rule</th><th>Value</th></tr>
+        <tr><td>Cho phép</td><td class="add">Swipe card: gradient bottom 30% của vùng ảnh — chỉ để đọc tên món</td></tr>
+        <tr><td>Gradient</td><td class="add">linear-gradient(to bottom, transparent 0%, rgba(30,20,16,.70) 100%)</td></tr>
+        <tr><td>Text trên gradient</td><td class="add">#FFFDF9 · Fraunces 600 · 17–20px</td></tr>
+        <tr><td>Không cho phép</td><td class="del">Gradient từ ảnh sang UI background · CSS blend-mode · Tint warm layer</td></tr>
+        <tr><td>Mọi nơi khác</td><td class="del">Không dùng gradient — photo blend tự nhiên qua color DNA chung</td></tr>
+      </table>
+    </div>
+
+    <!-- PHOTO-UI EDGE RULES -->
+    <div class="component-section">
+      <div class="component-label">Photo–UI Edge — Color DNA Alignment</div>
+      <table class="diff-table" style="max-width:560px;">
+        <tr><th>Photo Edge Zone</th><th>Màu tự nhiên</th><th>UI Token tương ứng</th></tr>
+        <tr><td>Vải linen (góc trên)</td><td style="color:var(--text-2);font-size:12px;">Kem ấm, off-white</td><td class="add">var(--bg) #FEF8F1 — khớp chính xác</td></tr>
+        <tr><td>Mặt bàn gỗ (dưới/bên)</td><td style="color:var(--text-2);font-size:12px;">Walnut nâu sẫm</td><td class="add">var(--text-1) #1E1410 — gần khớp</td></tr>
+        <tr><td>Viền bát</td><td style="color:var(--text-2);font-size:12px;">Nâu ấm/kem gốm</td><td class="add">var(--border-strong) #D4B8A5</td></tr>
+        <tr><td>Tông ấm tổng thể</td><td style="color:var(--text-2);font-size:12px;">Amber vàng</td><td class="add">var(--primary) #D9622B — cùng family</td></tr>
+        <tr><td>Nền bokeh mờ</td><td style="color:var(--text-2);font-size:12px;">Cream/nâu ấm mờ</td><td class="add">var(--surface-alt) #F7EDE0</td></tr>
+      </table>
+      <p style="font-size:13px;color:var(--text-2);margin-top:12px;line-height:1.7;">Hard edge giữa ảnh và UI là đúng — không cần gradient blend. Ảnh tự blend vì system prompt đã sinh ảnh có color DNA trùng với design tokens.</p>
+    </div>
+  </div>
+
+
+  <!-- FOOTER -->
+  <div class="doc-footer">
+    <span>Hôm Nay Ăn Gì · UI Design System v2.0 · March 2026</span>
+    <span>Internal Use Only · Based on Food Mood Reference</span>
+  </div>
+
+</div>
+</body>
+</html>

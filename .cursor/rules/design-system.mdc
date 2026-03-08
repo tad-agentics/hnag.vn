@@ -1,0 +1,14 @@
+---
+description: Design system token and component rules
+globs: src/components/**/*
+alwaysApply: false
+---
+
+- All components must use tokens from **src/styles/theme.css** (CSS custom properties) and classes defined there — no hardcoded hex or raw px. Full reference: **guidelines/Guidelines.md**.
+- Color: use semantic tokens (`var(--color-primary)`, `var(--color-surface)`, `var(--color-text-secondary)`, etc.) — never raw hex. Single accent: terracotta primary; health = sage; gold = premium only.
+- Spacing: 4px base grid; use `var(--space-*)` or Tailwind classes that map to theme (no arbitrary values like `p-[13px]`).
+- Depth: flat only — border + background contrast. `box-shadow` only for overlays/modals (`var(--shadow-overlay)`).
+- Typography: `var(--font-display)` (Fraunces) for display/headings; `var(--font-body)` (Be Vietnam Pro) for UI and body. No emoji — SVG icons only (stroke 1.5px, currentColor).
+- Every component must implement all states: default / loading / error / empty where applicable.
+- Component variants (buttons, pills, tags, callouts) must match guidelines Section 9 and theme.css `.btn-*`, `.pill-tag-*`, `.callout-*`, etc.
+- Never create a new component if an existing theme class or pattern in guidelines covers the use case.
