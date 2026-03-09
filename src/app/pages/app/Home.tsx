@@ -3,6 +3,7 @@ import { useNavigate } from "react-router";
 import { Check, X, Lightbulb, Sprout, Building2, ChefHat, Clock, DollarSign, UtensilsCrossed, Refrigerator, Search, Loader } from "lucide-react";
 import { useAuth } from "../../contexts/AuthContext";
 import { fetchDeck, recordSwipe } from "../../lib/deck";
+import { getEmptyDeckMessage } from "../../lib/deck/emptyDeckMessage";
 import { getTrialState, hasSoftNudgeBeenShown, markSoftNudgeShown } from "../../lib/trial";
 import { BottomNav } from "../../components/BottomNav";
 import { TrialRibbon } from "../../components/TrialRibbon";
@@ -68,7 +69,7 @@ const mockDishes: DishCard[] = [
 
 export function HomeScreen() {
   const navigate = useNavigate();
-  const { user, profile } = useAuth();
+  const { user, profile, session } = useAuth();
   const [sessionId] = useState(() => crypto.randomUUID());
   
   // State
@@ -144,17 +145,22 @@ export function HomeScreen() {
   useEffect(() => {
     if (!currentSlot || !user) return;
     setDeckLoading(true);
-    fetchDeck(activeMeal, currentSlot.type, 8, user?.id ?? undefined)
+    fetchDeck(activeMeal, currentSlot.type, 8, {
+      userId: user?.id,
+      sessionId,
+      accessToken: session?.access_token ?? undefined,
+    })
       .then((d) => {
         setDeck(d);
         setCurrentDishIndex(0);
-        setIsDeckEmpty(false);
+        setIsDeckEmpty(d.length === 0);
       })
       .catch(() => {
         setDeck([]);
+        setIsDeckEmpty(true);
       })
       .finally(() => setDeckLoading(false));
-  }, [user?.id, activeMeal, currentSlot?.type]);
+  }, [user?.id, activeMeal, currentSlot?.type, sessionId, session?.access_token]);
 
   const handleAccept = async () => {
     if (currentDish && user && currentSlot) {
@@ -166,7 +172,8 @@ export function HomeScreen() {
           activeMeal,
           currentSlot.type,
           sessionId,
-          currentDishIndex + 1
+          currentDishIndex + 1,
+          { accessToken: session?.access_token ?? undefined }
         );
       } catch (_) {}
     }
@@ -194,7 +201,8 @@ export function HomeScreen() {
           activeMeal,
           currentSlot.type,
           sessionId,
-          currentDishIndex + 1
+          currentDishIndex + 1,
+          { accessToken: session?.access_token ?? undefined }
         );
       } catch (_) {}
     }
@@ -662,10 +670,57 @@ export function HomeScreen() {
 
             {/* Card Body */}
             <div className="p-4">
+              {/* Health result pills (adapt/caution) — tech-spec §06 Pill Rendering Contract */}
+              {(currentDish.healthAction === 'adapt' || currentDish.healthAction === 'caution') && (
+                <div className="flex flex-wrap gap-2 mb-3">
+                  {currentDish.healthAction === 'adapt' && currentDish.memberAdaptations && currentDish.memberAdaptations.length > 0 ? (
+                    currentDish.memberAdaptations.map((a) => (
+                      <span
+                        key={a.member_name}
+                        className="px-3 py-1 rounded-full inline-flex items-center gap-1"
+                        style={{
+                          backgroundColor: 'var(--color-health-light)',
+                          border: '1px solid var(--color-health-border)',
+                          fontSize: '12px',
+                          fontWeight: 500,
+                          color: 'var(--color-health)'
+                        }}>
+                        🔧 Điều chỉnh cho {a.member_name}
+                      </span>
+                    ))
+                  ) : currentDish.healthAction === 'adapt' ? (
+                    <span
+                      className="px-3 py-1 rounded-full"
+                      style={{
+                        backgroundColor: 'var(--color-health-light)',
+                        border: '1px solid var(--color-health-border)',
+                        fontSize: '12px',
+                        fontWeight: 500,
+                        color: 'var(--color-health)'
+                      }}>
+                      🔧 Điều chỉnh phần — bữa nhẹ hơn
+                    </span>
+                  ) : null}
+                  {currentDish.healthAction === 'caution' && (
+                    <span
+                      className="px-3 py-1 rounded-full"
+                      style={{
+                        backgroundColor: 'var(--color-warn-light, #FEF3E2)',
+                        border: '1px solid var(--color-warn-border, #E8C99B)',
+                        fontSize: '12px',
+                        fontWeight: 500,
+                        color: 'var(--color-warn, #B45309)'
+                      }}>
+                      ⚠ Dùng lượng nhỏ
+                      {currentDish.healthTooltipDetail ? ` · ${currentDish.healthTooltipDetail}` : ''}
+                    </span>
+                  )}
+                </div>
+              )}
               {/* Health Tags + Meta Info Pills */}
               <div className="flex items-center gap-2 mb-3 flex-wrap">
                 {/* Health Tags */}
-                {currentDish.healthTags.map((tag) => (
+                {(currentDish.healthTags ?? []).map((tag) => (
                   <span
                     key={tag}
                     className="px-3 py-1 rounded-full"
@@ -779,8 +834,10 @@ export function HomeScreen() {
         </div>
       )}
 
-      {/* Empty Deck State - S-05e */}
-      {isDeckEmpty && currentSlot && (
+      {/* Empty Deck State - S-05e (template from lib/deck/emptyDeckMessage) */}
+      {isDeckEmpty && currentSlot && (() => {
+        const emptyMsg = getEmptyDeckMessage(currentSlot.name);
+        return (
         <div className="px-4 mb-6">
           {/* Empty Card */}
           <div 
@@ -801,7 +858,7 @@ export function HomeScreen() {
                 color: 'var(--color-text-primary)',
                 marginBottom: '8px'
               }}>
-              Đã xem hết món phù hợp cho slot {currentSlot.name}
+              {emptyMsg.title}
             </h3>
             <p
               style={{
@@ -809,7 +866,7 @@ export function HomeScreen() {
                 color: 'var(--color-text-secondary)',
                 lineHeight: '1.6'
               }}>
-              Thử mở rộng điều kiện lọc, đổi loại slot, hoặc nhập tên món
+              {emptyMsg.description}
             </p>
           </div>
 
@@ -895,7 +952,7 @@ export function HomeScreen() {
             </div>
           )}
         </div>
-      )}
+        ); })()}
 
       {/* Filter Expansion Bottom Sheet */}
       <BottomSheet

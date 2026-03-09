@@ -40,7 +40,7 @@ export function SummaryScreen() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const location = useLocation();
-  const { user, profile, refreshProfile } = useAuth();
+  const { user, profile, refreshProfile, session } = useAuth();
   
   const mealType: MealType = (searchParams.get('meal') as MealType) || 'dinner';
   const fridgeMode = searchParams.get('fridge') === 'true';
@@ -81,8 +81,10 @@ export function SummaryScreen() {
       .map((s) => ({ dish_id: s.dish!.id, slot_type: s.type, is_auto: s.type === 'rice' }));
     if (dishesPayload.length === 0) return;
     const today = new Date().toISOString().slice(0, 10);
-    saveMealPlan(user.id, today, mealType, dishesPayload).catch(() => {});
-  }, [user?.id, mealType, stateSlots]);
+    saveMealPlan(user.id, today, mealType, dishesPayload, {
+      accessToken: session?.access_token ?? undefined,
+    }).catch(() => {});
+  }, [user?.id, mealType, stateSlots, session?.access_token]);
 
   useEffect(() => {
     if (!user?.id || !recognitionCopy?.key) return;

@@ -12,7 +12,10 @@ const HEALTH_CONDITIONS = [
   'Dạ dày',
   'Tiểu đường',
   'Huyết áp',
-  'Không có'
+  'Gan nhiễm mỡ',
+  'Suy thận',
+  'Muốn giảm cân',
+  'Không có',
 ];
 
 export function HealthSetupScreen() {

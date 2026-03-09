@@ -1,8 +1,9 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router";
 import { Camera } from "lucide-react";
 import { toast } from "sonner";
 import { SettingsLayout } from "../../components/SettingsLayout";
+import { useAuth } from "../../contexts/AuthContext";
 
 interface UserProfile {
   display_name: string;
@@ -18,32 +19,62 @@ interface ValidationErrors {
   phone?: string;
 }
 
+const defaultProfile: UserProfile = {
+  display_name: '',
+  email: '',
+  phone: '',
+  avatar_url: null,
+  auth_provider: 'phone',
+};
+
 export function EditProfileScreen() {
   const navigate = useNavigate();
   const fileInputRef = useRef<HTMLInputElement>(null);
-  
-  // Mock user data - in production, fetch from API
-  const [originalProfile] = useState<UserProfile>({
-    display_name: 'Nguyễn Thị Mai',
-    email: 'mai.nguyen@example.com',
-    phone: '+84987654321',
-    avatar_url: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=200',
-    auth_provider: 'google'
-  });
+  const { profile: authProfile, session, refreshProfile } = useAuth();
 
-  const [profile, setProfile] = useState<UserProfile>(originalProfile);
-  const [avatarPreview, setAvatarPreview] = useState<string | null>(profile.avatar_url);
+  const [originalProfile, setOriginalProfile] = useState<UserProfile>(defaultProfile);
+  const [profile, setProfile] = useState<UserProfile>(defaultProfile);
+  const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
+  const [profileLoading, setProfileLoading] = useState(true);
+  const [pendingAvatarFile, setPendingAvatarFile] = useState<File | null>(null);
   const [errors, setErrors] = useState<ValidationErrors>({});
   const [isSaving, setIsSaving] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
 
-  // Check if form has changes
-  const hasChanges = 
+  useEffect(() => {
+    if (!session?.access_token) {
+      setProfileLoading(false);
+      return;
+    }
+    fetch('/api/user/profile', {
+      headers: { Authorization: `Bearer ${session.access_token}` },
+    })
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data: { display_name?: string; email?: string; phone?: string; avatar_url?: string | null; auth_provider?: string } | null) => {
+        if (data) {
+          const p: UserProfile = {
+            display_name: data.display_name ?? authProfile?.display_name ?? '',
+            email: data.email ?? authProfile?.email ?? '',
+            phone: data.phone ?? '',
+            avatar_url: data.avatar_url ?? null,
+            auth_provider: (data.auth_provider as UserProfile['auth_provider']) ?? 'phone',
+          };
+          setOriginalProfile(p);
+          setProfile(p);
+          setAvatarPreview(p.avatar_url);
+        }
+      })
+      .finally(() => setProfileLoading(false));
+  }, [session?.access_token, authProfile?.display_name, authProfile?.email]);
+
+  // Check if form has changes (including new avatar)
+  const hasChanges =
     profile.display_name !== originalProfile.display_name ||
     profile.email !== originalProfile.email ||
     profile.phone !== originalProfile.phone ||
-    avatarPreview !== originalProfile.avatar_url;
+    avatarPreview !== originalProfile.avatar_url ||
+    pendingAvatarFile !== null;
 
   // Check if save button should be enabled
   const canSave = hasChanges && Object.keys(errors).length === 0 && !isSaving;
@@ -108,12 +139,9 @@ export function EditProfileScreen() {
       return;
     }
 
-    // Create preview (in production, would open crop modal here)
+    setPendingAvatarFile(file);
     const reader = new FileReader();
-    reader.onloadend = () => {
-      setAvatarPreview(reader.result as string);
-      // In production: upload to /api/user/avatar here
-    };
+    reader.onloadend = () => setAvatarPreview(reader.result as string);
     reader.readAsDataURL(file);
   };
 
@@ -143,20 +171,84 @@ export function EditProfileScreen() {
     setIsSaving(true);
 
     try {
-      // Mock API call - in production: PUT /api/user/profile
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      // Success
-      toast.success('Đã lưu');
-      setTimeout(() => {
-        navigate('/app/settings');
-      }, 500);
-    } catch (error: any) {
-      if (error.status === 409) {
-        setErrors({ email: 'Email này đã được dùng' });
-      } else {
-        toast.error('Lưu không thành công — thử lại nhé');
+      const token = session?.access_token;
+      if (!token) {
+        toast.error('Phiên đăng nhập hết hạn');
+        setIsSaving(false);
+        return;
       }
+      let avatarUrl: string | null = originalProfile.avatar_url;
+      if (pendingAvatarFile) {
+        const fd = new FormData();
+        fd.append('file', pendingAvatarFile);
+        const avatarRes = await fetch('/api/user/avatar', {
+          method: 'POST',
+          headers: { Authorization: `Bearer ${token}` },
+          body: fd,
+        });
+        if (!avatarRes.ok) {
+          const err = await avatarRes.json().catch(() => ({}));
+          toast.error(err?.error === 'File too large' ? 'Ảnh tối đa 5MB' : 'Tải ảnh không thành công — thử lại nhé');
+          setIsSaving(false);
+          return;
+        }
+        const data = (await avatarRes.json()) as { avatar_url?: string };
+        avatarUrl = data.avatar_url ?? null;
+        setPendingAvatarFile(null);
+        setAvatarPreview(avatarUrl);
+        setOriginalProfile((p) => ({ ...p, avatar_url: avatarUrl }));
+        setProfile((p) => ({ ...p, avatar_url: avatarUrl }));
+      }
+      const payload: Record<string, string> = {};
+      if (profile.display_name !== originalProfile.display_name) payload.display_name = profile.display_name;
+      if (profile.email !== originalProfile.email) payload.email = profile.email;
+      if (profile.phone !== originalProfile.phone) payload.phone = profile.phone;
+      if (Object.keys(payload).length === 0) {
+        refreshProfile?.();
+        toast.success('Đã lưu');
+        setIsSaving(false);
+        navigate('/app/settings');
+        return;
+      }
+      const res = await fetch('/api/user/profile', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(payload),
+      });
+      if (!res.ok) {
+        if (res.status === 409) {
+          setErrors({ email: 'Email này đã được dùng' });
+        } else {
+          toast.error('Lưu không thành công — thử lại nhé');
+        }
+        setIsSaving(false);
+        return;
+      }
+      const updated = (await res.json()) as {
+        display_name?: string;
+        email?: string;
+        phone?: string;
+        avatar_url?: string | null;
+        auth_provider?: string;
+      };
+      const p: UserProfile = {
+        display_name: updated.display_name ?? profile.display_name,
+        email: updated.email ?? profile.email,
+        phone: updated.phone ?? profile.phone,
+        avatar_url: updated.avatar_url ?? profile.avatar_url,
+        auth_provider: (updated.auth_provider as UserProfile['auth_provider']) ?? profile.auth_provider,
+      };
+      setOriginalProfile(p);
+      setProfile(p);
+      toast.success('Đã lưu');
+      refreshProfile?.();
+      setTimeout(() => navigate('/app/settings'), 500);
+    } catch {
+      toast.error('Lưu không thành công — thử lại nhé');
+    } finally {
       setIsSaving(false);
     }
   };

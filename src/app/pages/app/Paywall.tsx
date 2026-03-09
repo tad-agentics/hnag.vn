@@ -1,24 +1,33 @@
 import { useState } from "react";
 import { useNavigate, useSearchParams } from "react-router";
 import { Lock, Star } from "lucide-react";
+import { toast } from "sonner";
 import { BottomNav } from "../../components/BottomNav";
+import { useAuth } from "../../contexts/AuthContext";
 
 type PlanOption = '6months' | '12months' | 'lifetime';
+
+const PLAN_TO_API: Record<PlanOption, '6m' | '12m' | 'lifetime'> = {
+  '6months': '6m',
+  '12months': '12m',
+  lifetime: 'lifetime',
+};
 
 export function PaywallScreen() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
+  const { session } = useAuth();
 
-  // Map query param plan names to internal plan IDs
   const getInitialPlan = (): PlanOption => {
     const planParam = searchParams.get('plan');
     if (planParam === 'yearly' || planParam === '12months') return '12months';
     if (planParam === '6months') return '6months';
     if (planParam === 'lifetime') return 'lifetime';
-    return '12months'; // default
+    return '12months';
   };
 
   const [selectedPlan, setSelectedPlan] = useState<PlanOption>(getInitialPlan);
+  const [isLoading, setIsLoading] = useState(false);
 
   // Mock personalized value data
   const totalSuggestions = 127;
@@ -50,10 +59,40 @@ export function PaywallScreen() {
 
   const selectedPlanData = plans.find(p => p.id === selectedPlan);
 
-  const handlePurchase = () => {
-    console.log('Purchase plan:', selectedPlan);
-    // Navigate to success screen with plan parameter
-    navigate(`/app/purchase-success?plan=${selectedPlan}`);
+  const handlePurchase = async () => {
+    if (!session?.access_token) {
+      toast.error('Vui lòng đăng nhập để mua gói');
+      return;
+    }
+    setIsLoading(true);
+    try {
+      const res = await fetch('/api/payment/create-order', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${session.access_token}`,
+        },
+        body: JSON.stringify({ plan_type: PLAN_TO_API[selectedPlan] }),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        if (res.status === 409) {
+          toast.error('Bạn đã có gói đang kích hoạt');
+          navigate('/app/home');
+          return;
+        }
+        toast.error(data?.error ?? 'Tạo đơn thất bại — thử lại nhé');
+        setIsLoading(false);
+        return;
+      }
+      const checkoutUrl = data.checkout_url;
+      if (checkoutUrl) window.location.href = checkoutUrl;
+      else toast.error('Không nhận được link thanh toán');
+    } catch {
+      toast.error('Lỗi kết nối — thử lại nhé');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -325,11 +364,13 @@ export function PaywallScreen() {
           {/* CTA Button */}
           <button
             onClick={handlePurchase}
+            disabled={isLoading}
             className="btn btn-primary w-full rounded-full transition-all mb-4"
             style={{
-              height: '52px'
+              height: '52px',
+              opacity: isLoading ? 0.7 : 1
             }}>
-            Mua gói {selectedPlanData?.label} — trả một lần
+            {isLoading ? 'Đang tạo đơn...' : `Mua gói ${selectedPlanData?.label} — trả một lần`}
           </button>
 
           {/* Price Subtext */}

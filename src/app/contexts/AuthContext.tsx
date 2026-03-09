@@ -13,6 +13,7 @@ export interface UserProfile {
   id: string;
   email: string | null;
   display_name: string | null;
+  avatar_url: string | null;
   onboarding_completed: boolean;
   subscription_status: string | null;
   trial_started_at: string | null;
@@ -39,9 +40,48 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(true);
 
   const fetchProfile = useCallback(async (userId: string) => {
+    const {
+      data: { session: s },
+    } = await supabase.auth.getSession();
+    if (s?.access_token) {
+      try {
+        const res = await fetch('/api/user/profile', {
+          headers: { Authorization: `Bearer ${s.access_token}` },
+        });
+        if (res.ok) {
+          const data = (await res.json()) as {
+            id: string;
+            email: string | null;
+            display_name: string | null;
+            avatar_url?: string | null;
+            onboarding_completed: boolean;
+            subscription_status: string | null;
+            trial_started_at: string | null;
+            care_days_count: number;
+            last_recognition_copy_key: string | null;
+          };
+          setProfile({
+            id: data.id,
+            email: data.email ?? null,
+            display_name: data.display_name ?? null,
+            avatar_url: data.avatar_url ?? null,
+            onboarding_completed: data.onboarding_completed ?? false,
+            subscription_status: data.subscription_status ?? null,
+            trial_started_at: data.trial_started_at ?? null,
+            care_days_count: Number(data.care_days_count ?? 0),
+            last_recognition_copy_key: data.last_recognition_copy_key ?? null,
+          });
+          return;
+        }
+      } catch {
+        // fallback to Supabase
+      }
+    }
     const { data } = await supabase
       .from('users')
-      .select('id, email, display_name, onboarding_completed, subscription_status, trial_started_at, care_days_count, last_recognition_copy_key')
+      .select(
+        'id, email, display_name, avatar_url, onboarding_completed, subscription_status, trial_started_at, care_days_count, last_recognition_copy_key'
+      )
       .eq('id', userId)
       .single();
     if (data) {
@@ -49,6 +89,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         id: data.id,
         email: data.email ?? null,
         display_name: data.display_name ?? null,
+        avatar_url: data.avatar_url ?? null,
         onboarding_completed: data.onboarding_completed ?? false,
         subscription_status: data.subscription_status ?? null,
         trial_started_at: data.trial_started_at ?? null,
